@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedControl - Sistema Completo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>Med<span>Control</span></h1>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" data-page="estoque">
+                        <i class="fas fa-pills"></i>
+                        <span>Controle de Estoque</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="prontuario">
+                        <i class="fas fa-file-medical"></i>
+                        <span>Prontuário Eletrônico</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="checklist">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Checklist de Plantão</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="configuracoes">
+                        <i class="fas fa-cog"></i>
+                        <span>Configurações</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sair</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1 class="page-title" id="pageTitle">Controle de Estoque</h1>
+                <div class="user-info">
+                    <div class="user-avatar">K</div>
+                    <span>karol</span>
+                </div>
+            </div>
+
+            <!-- Página: Controle de Estoque -->
+            <div class="page-content active" id="estoque-page">
+                <!-- Filters Section -->
+                <section class="filters">
+                    <h2 class="filter-title">Filtrar Medicamentos</h2>
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="Pesquisar por nome...">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="category-filter">
+                        <button class="category-btn active" data-category="all">Todas as Categorias</button>
+                        <button class="category-btn" data-category="analgesicos">Analgésicos e Sedativos</button>
+                        <button class="category-btn" data-category="antibioticos">Antibióticos</button>
+                        <button class="category-btn" data-category="cardiovasculares">Cardiovasculares</button>
+                        <button class="category-btn" data-category="solucoes">Soluções e Eletrólitos</button>
+                        <button class="category-btn" data-category="anticoagulantes">Anticoagulantes</button>
+                        <button class="category-btn" data-category="anticonvulsivantes">Anticonvulsivantes</button>
+                        <button class="category-btn" data-category="corticoides">Corticoides</button>
+                        <button class="category-btn" data-category="antiemeticos">Antieméticos</button>
+                        <button class="category-btn" data-category="outros">Outros Essenciais</button>
+                    </div>
+                </section>
+
+                <!-- Medicines Grid -->
+                <section class="medicines-grid" id="medicines-container">
+                    <!-- Os medicamentos serão carregados aqui via JavaScript -->
+                </section>
+            </div>
+
+            <!-- Página: Prontuário Eletrônico -->
+            <div class="page-content" id="prontuario-page">
+                <div class="prontuario-container">
+                    <!-- Header do Prontuário -->
+                    <div class="prontuario-header">
+                        <div class="consultation-info">
+                            <div class="duration-box">
+                                <div class="duration-label">Duração da consulta</div>
+                                <div class="duration-time">00:30:00</div>
+                            </div>
+                            <div id="current-date">Quinta-feira</div>
+                        </div>
+                        <button class="start-btn" id="startConsultationBtn">
+                            <i class="fas fa-play"></i>
+                            Iniciar Atendimento
+                        </button>
+                    </div>
+
+                    <!-- Informações do Paciente -->
+                    <div class="patient-info">
+                        <div class="patient-header">
+                            <div class="patient-main-info">
+                                <div class="form-group">
+                                    <label class="form-label">Nome do Paciente</label>
+                                    <input type="text" class="form-control" id="patient-name" placeholder="Digite o nome completo do paciente">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Informações Adicionais</label>
+                                    <input type="text" class="form-control" id="patient-info" placeholder="Idade, primeira consulta, convênio, etc.">
+                                </div>
+                            </div>
+                            <button class="view-profile-btn" id="viewProfileBtn">
+                                <i class="fas fa-user"></i>
+                                Visualizar cadastro
+                            </button>
+                        </div>
+
+                        <!-- Sinais Vitais -->
+                        <h3 class="vitals-title">Sinais Vitais</h3>
+                        <div class="vital-signs">
+                            <div class="vital-item">
+                                <input type="text" class="vital-input" placeholder="Peso (kg)">
+                                <div class="vital-label">Peso</div>
+                            </div>
+                            <div class="vital-item">
+                                <input type="text" class="vital-input" placeholder="Altura (cm)">
+                                <div class="vital-label">Altura</div>
+                            </div>
+                            <div class="vital-item">
+                                <input type="text" class="vital-input" placeholder="IMC">
+                                <div class="vital-label">IMC</div>
+                            </div>
+                            <div class="vital-item">
+                                <input type="text" class="vital-input" placeholder="Pressão">
+                                <div class="vital-label">Pressão</div>
+                            </div>
+                            <div class="vital-item">
+                                <input type="text" class="vital-input" placeholder="Freq. Cardíaca">
+                                <div class="vital-label">Freq. Cardíaca</div>
+                            </div>
+                            <div class="vital-item">
+                                <input type="text" class="vital-input" placeholder="Temperatura">
+                                <div class="vital-label">Temperatura</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conteúdo do Prontuário -->
+                    <div class="prontuario-content">
+                        <h3 class="section-title">Resumo da Consulta</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">História da Doença Atual</label>
+                            <textarea class="form-control" id="current-illness" placeholder="Descreva a história da doença atual..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Exame Físico</label>
+                            <textarea class="form-control" id="physical-exam" placeholder="Descreva os achados do exame físico..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Diagnóstico</label>
+                            <textarea class="form-control" id="diagnosis" placeholder="Informe o diagnóstico..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Conduta e Prescrições</label>
+                            <textarea class="form-control" id="treatment" placeholder="Descreva a conduta médica e prescrições..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Evolução</label>
+                            <textarea class="form-control" id="evolution" placeholder="Registre a evolução do paciente..."></textarea>
+                        </div>
+                        
+                        <div class="prontuario-actions">
+                            <button class="btn btn-primary" id="save-prontuario">
+                                <i class="fas fa-save"></i>
+                                Salvar Prontuário
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-print"></i>
+                                Imprimir
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-share"></i>
+                                Compartilhar
+                            </button>
+                            <button class="btn btn-outline" id="clear-form">
+                                <i class="fas fa-eraser"></i>
+                                Limpar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página: Checklist de Plantão ATUALIZADA -->
+            <div class="page-content" id="checklist-page">
+                <div class="checklist-container">
+                    <!-- Informações do Plantão -->
+                    <div class="shift-info">
+                        <div class="shift-details">
+                            <h3>Plantão Noturno - Enfermaria A</h3>
+                            <div class="shift-date">21 de Outubro, 2025 - 19:00 às 07:00</div>
+                        </div>
+                        <div class="shift-status">
+                            <span class="stock-status in-stock">PLANTÃO EM ANDAMENTO</span>
+                        </div>
+                    </div>
+
+                    <!-- Seção 1: Escala de Profissionais -->
+                    <div class="checklist-section">
+                        <div class="section-header">
+                            <div>
+                                <h3 class="section-title">Escala de Profissionais</h3>
+                                <div class="section-subtitle">Conferir escala e confirmar presença da equipe</div>
+                            </div>
+                            <button class="toggle-form-btn" id="toggleTeamForm">
+                                <i class="fas fa-plus"></i>
+                                Adicionar Profissional
+                            </button>
+                        </div>
+
+                        <!-- Formulário para Adicionar Profissional -->
+                        <div class="add-item-form" id="teamForm" style="display: none;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Nome do Profissional</label>
+                                    <input type="text" class="form-control" id="teamMemberName" placeholder="Ex: Dra. Ana Silva">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Cargo/Função</label>
+                                    <input type="text" class="form-control" id="teamMemberRole" placeholder="Ex: Médica Plantonista">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Status Inicial</label>
+                                    <select class="form-control" id="teamMemberStatus">
+                                        <option value="present">Presente</option>
+                                        <option value="absent">Ausente</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button class="cancel-btn" id="cancelTeamForm">Cancelar</button>
+                                <button class="add-btn" id="addTeamMember">
+                                    <i class="fas fa-user-plus"></i>
+                                    Adicionar Profissional
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Lista de Profissionais -->
+                        <div class="team-grid" id="teamMembersList">
+                            <!-- Profissionais serão adicionados dinamicamente aqui -->
+                        </div>
+
+                        <div class="checklist-items">
+                            <div class="checklist-item completed">
+                                <input type="checkbox" id="scale1" checked>
+                                <label for="scale1">
+                                    Confirmar presença de todos os profissionais escalados
+                                    <div class="item-description">Verificar se toda a equipe designada está presente e em condições de trabalho</div>
+                                </label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="scale2">
+                                <label for="scale2">
+                                    Comunicar ausências à coordenação
+                                    <div class="item-description">Reportar imediatamente qualquer profissional ausente para reorganização da escala</div>
+                                </label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="scale3">
+                                <label for="scale3">
+                                    Distribuir atribuições da equipe
+                                    <div class="item-description">Definir claramente as responsabilidades de cada membro da equipe</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção 2: Revisão de Pacientes -->
+                    <div class="checklist-section">
+                        <div class="section-header">
+                            <div>
+                                <h3 class="section-title">Revisão de Pacientes</h3>
+                                <div class="section-subtitle">Pacientes sob responsabilidade do plantão</div>
+                            </div>
+                            <button class="toggle-form-btn" id="togglePatientForm">
+                                <i class="fas fa-plus"></i>
+                                Adicionar Paciente
+                            </button>
+                        </div>
+
+                        <!-- Formulário para Adicionar Paciente -->
+                        <div class="add-item-form" id="patientForm" style="display: none;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Nome do Paciente</label>
+                                    <input type="text" class="form-control" id="patientName" placeholder="Ex: João da Silva">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Leito</label>
+                                    <input type="text" class="form-control" id="patientBed" placeholder="Ex: 201 - Enfermaria A">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Prioridade</label>
+                                    <select class="form-control" id="patientPriority">
+                                        <option value="high">Alta</option>
+                                        <option value="medium">Média</option>
+                                        <option value="low">Baixa</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Diagnóstico e Observações</label>
+                                <textarea class="form-control" id="patientDiagnosis" placeholder="Descreva o diagnóstico principal e observações importantes..." rows="3"></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button class="cancel-btn" id="cancelPatientForm">Cancelar</button>
+                                <button class="add-btn" id="addPatient">
+                                    <i class="fas fa-user-plus"></i>
+                                    Adicionar Paciente
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Lista de Pacientes -->
+                        <div class="patient-list" id="patientsList">
+                            <!-- Pacientes serão adicionados dinamicamente aqui -->
+                        </div>
+
+                        <div class="checklist-items">
+                            <div class="checklist-item completed">
+                                <input type="checkbox" id="review1" checked>
+                                <label for="review1">
+                                    Confirmar lista completa de pacientes
+                                    <div class="item-description">Verificar todos os pacientes sob responsabilidade do plantão atual</div>
+                                </label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="review2">
+                                <label for="review2">
+                                    Revisar diagnósticos principais
+                                    <div class="item-description">Conhecer as condições clínicas de cada paciente</div>
+                                </label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="review3">
+                                <label for="review3">
+                                    Identificar pacientes críticos
+                                    <div class="item-description">Marcar pacientes que necessitam de atenção especial durante o plantão</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção 3: Passagem de Plantão -->
+                    <div class="checklist-section">
+                        <div class="section-header">
+                            <div>
+                                <h3 class="section-title">Passagem de Plantão</h3>
+                                <div class="section-subtitle">Receber informações do plantão anterior</div>
+                            </div>
+                        </div>
+                        
+                        <div class="handoff-notes">
+                            <div class="notes-title">Resumo do Plantão Anterior (Dr. Roberto - 07:00 às 19:00):</div>
+                            <div class="notes-content">
+                                • Paciente leito 201 (João): Apresentou piora da SpO2 às 16h, necessitando de O2 a 5L/min. Hemodinamicamente estável.<br>
+                                • Paciente leito 210 (Ana): Diurese adequada (40ml/h), mantendo restrição hídrica. Queixa de dor abdominal leve.<br>
+                                • Leito 215 recebeu alta às 14h. Leito vago disponível para admissão.<br>
+                                • Medicações de rotina administradas conforme prescrição.<br>
+                                • Nenhuma intercorrência grave no plantão.
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-items">
+                            <div class="checklist-item completed">
+                                <input type="checkbox" id="handoff1" checked>
+                                <label for="handoff1">
+                                    Receber passagem verbal completa
+                                    <div class="item-description">Escutar atentamente o resumo do plantão anterior</div>
+                                </label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="handoff2">
+                                <label for="handoff2">
+                                    Revisar prontuários atualizados
+                                    <div class="item-description">Verificar últimas anotações e evoluções</div>
+                                </label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="handoff3">
+                                <label for="handoff3">
+                                    Confirmar pendências e alertas
+                                    <div class="item-description">Anotar exames pendentes e situações que necessitam acompanhamento</div>
+                                </label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="handoff4">
+                                <label for="handoff4">
+                                    Assinar termo de passagem
+                                    <div class="item-description">Confirmar recebimento formal do plantão</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página: Configurações MELHORADA -->
+            <div class="page-content" id="configuracoes-page">
+                <div class="settings-container">
+                    
+                    <!-- Seção: Perfil do Usuário -->
+                    <div class="settings-section">
+                        <div class="settings-header">
+                            <div class="settings-icon">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+                            <div>
+                                <h2 class="settings-title">Perfil do Usuário</h2>
+                                <div class="settings-subtitle">Gerencie suas informações pessoais e preferências</div>
+                            </div>
+                        </div>
+                        <div class="settings-content">
+                            <div class="profile-header">
+                                <div class="profile-avatar">K</div>
+                                <div class="profile-info">
+                                    <h3>karol</h3>
+                                    <p>Médica Plantonista • Último acesso: Hoje, 14:30</p>
+                                    <div class="profile-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-value">42</div>
+                                            <div class="stat-label">Pacientes</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-value">18</div>
+                                            <div class="stat-label">Prontuários</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-value">96%</div>
+                                            <div class="stat-label">Atividade</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-grid">
+                                <div class="setting-card">
+                                    <div class="setting-card-header">
+                                        <div class="setting-card-icon">
+                                            <i class="fas fa-user-edit"></i>
+                                        </div>
+                                        <h4 class="setting-card-title">Informações Pessoais</h4>
+                                    </div>
+                                    <div class="setting-card-description">
+                                        Atualize seus dados pessoais e informações de contato.
+                                    </div>
+                                    <div class="setting-actions">
+                                        <button class="btn btn-primary">
+                                            <i class="fas fa-edit"></i>
+                                            Editar Perfil
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-card">
+                                    <div class="setting-card-header">
+                                        <div class="setting-card-icon">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                        <h4 class="setting-card-title">Preferências de Notificação</h4>
+                                    </div>
+                                    <div class="setting-card-description">
+                                        Configure como e quando receber notificações do sistema.
+                                    </div>
+                                    
+                                    <div class="setting-option">
+                                        <div>
+                                            <div class="option-label">Notificações por Email</div>
+                                            <div class="option-description">Receba alertas importantes por email</div>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="setting-option">
+                                        <div>
+                                            <div class="option-label">Notificações Push</div>
+                                            <div class="option-description">Alertas instantâneos no sistema</div>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="setting-option">
+                                        <div>
+                                            <div class="option-label">Lembretes de Medicamentos</div>
+                                            <div class="option-description">Alertas para estoque baixo</div>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção: Aparência e Tema -->
+                    <div class="settings-section">
+                        <div class="settings-header">
+                            <div class="settings-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div>
+                                <h2 class="settings-title">Aparência e Tema</h2>
+                                <div class="settings-subtitle">Personalize a aparência do sistema</div>
+                            </div>
+                        </div>
+                        <div class="settings-content">
+                            <div class="settings-grid">
+                                <div class="setting-card">
+                                    <div class="setting-card-header">
+                                        <div class="setting-card-icon">
+                                            <i class="fas fa-fill-drip"></i>
+                                        </div>
+                                        <h4 class="setting-card-title">Tema de Cores</h4>
+                                    </div>
+                                    <div class="setting-card-description">
+                                        Escolha um tema que melhor se adapte ao seu ambiente de trabalho.
+                                    </div>
+                                    
+                                    <div class="theme-previews">
+                                        <div class="theme-preview theme-light active">
+                                            <div class="theme-header"></div>
+                                            <div class="theme-sidebar"></div>
+                                            <div class="theme-content"></div>
+                                            <div class="theme-label">Tema Claro</div>
+                                        </div>
+                                        <div class="theme-preview theme-dark">
+                                            <div class="theme-header"></div>
+                                            <div class="theme-sidebar"></div>
+                                            <div class="theme-content"></div>
+                                            <div class="theme-label">Tema Escuro</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-card">
+                                    <div class="setting-card-header">
+                                        <div class="setting-card-icon">
+                                            <i class="fas fa-text-height"></i>
+                                        </div>
+                                        <h4 class="setting-card-title">Tamanho da Fonte</h4>
+                                    </div>
+                                    <div class="setting-card-description">
+                                        Ajuste o tamanho do texto para melhor legibilidade.
+                                    </div>
+                                    
+                                    <div class="range-container">
+                                        <input type="range" min="12" max="24" value="16" class="range-slider" id="fontSizeSlider">
+                                        <div class="range-value" id="fontSizeValue">16px</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-card">
+                                    <div class="setting-card-header">
+                                        <div class="setting-card-icon">
+                                            <i class="fas fa-language"></i>
+                                        </div>
+                                        <h4 class="setting-card-title">Idioma e Região</h4>
+                                    </div>
+                                    <div class="setting-card-description">
+                                        Defina o idioma e formato de datas e números.
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Idioma</label>
+                                        <select class="styled-select">
+                                            <option>Português (Brasil)</option>
+                                            <option>English (US)</option>
+                                            <option>Español</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Formato de Data</label>
+                                        <select class="styled-select">
+                                            <option>DD/MM/AAAA</option>
+                                            <option>MM/DD/AAAA</option>
+                                            <option>AAAA-MM-DD</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seção: Segurança e Privacidade -->
+                    <div class="settings-section">
+                        <div class="settings-header">
+                            <div class="settings-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div>
+                                <h2 class="settings-title">Segurança e Privacidade</h2>
+                                <div class="settings-subtitle">Proteja sua conta e dados</div>
+                            </div>
+                        </div>
+                        <div class="settings-content">
+                            <div class="settings-grid">
+                                <div class="setting-card">
+                                    <div class="setting-card-header">
+                                        <div class="setting-card-icon">
+                                            <i class="fas fa-key"></i>
+                                        </div>
+                                        <h4 class="setting-card-title">Alterar Senha</h4>
+                                    </div>
+                                    <div class="setting-card-description">
+                                        Atualize sua senha regularmente para manter a conta segura.
+                                    </div>
+                                    
+                                    <div class="security-level">
+                                        <div class="security-bar">
+                                            <div class="security-fill" style="width: 85%"></div>
+                                        </div>
+                                        <div class="security-text">Forte</div>
+                                    </div>
+                                    
+                                    <div class="setting-actions">
+                                        <button class="btn btn-primary">
+                                            <i class="fas fa-key"></i>
+                                            Alterar Senha
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-card">
+                                    <div class="setting-card-header">
+                                        <div class="setting-card-icon">
+                                            <i class="fas fa-user-shield"></i>
+                                        </div>
+                                        <h4 class="setting-card-title">Autenticação de Dois Fatores</h4>
+                                    </div>
+                                    <div class="setting-card-description">
+                                        Adicione uma camada extra de segurança à sua conta.
+                                    </div>
+                                    
+                                    <div class="setting-option">
+                                        <div>
+                                            <div class="option-label">2FA Ativado</div>
+                                            <div class="option-description">Requer código adicional no login</div>
+                                        </div>
+                                        <label class="switch">
+                                            <input type="checkbox">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="setting-actions">
+                                        <button class="btn btn-outline">
+                                            <i class="fas fa-cog"></i>
+                                            Configurar
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-card">
+                                    <div class="setting-card-header">
+                                        <div class="setting-card-icon">
+                                            <i class="fas fa-history"></i>
+                                        </div>
+                                        <h4 class="setting-card-title">Sessões Ativas</h4>
+                                    </div>
+                                    <div class="setting-card-description">
+                                        Gerencie dispositivos conectados à sua conta.
+                                    </div>
+                                    
+                                    <div class="setting-option">
+                                        <div>
+                                            <div class="option-label">Este dispositivo</div>
+                                            <div class="option-description">Chrome • Windows • Ativo agora</div>
+                                        </div>
+                                        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem;">
+                                            Sair
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="setting-option">
+                                        <div>
+                                            <div class="option-label">Smartphone Android</div>
+                                            <div class="option-description">Samsung • Último acesso: 2 dias atrás</div>
+                                        </div>
+                                        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem;">
+                                            Sair
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ações Gerais -->
+                    <div class="setting-actions" style="justify-content: flex-end; margin-top: 20px;">
+                        <button class="btn-cancel">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </button>
+                        <button class="btn-reset">
+                            <i class="fas fa-undo"></i>
+                            Redefinir
+                        </button>
+                        <button class="btn-save">
+                            <i class="fas fa-save"></i>
+                            Salvar Alterações
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Alteração de Quantidade -->
+    <div class="modal" id="quantityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="quantityModalTitle">Alterar Quantidade</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Quantidade Atual</label>
+                    <div id="current-quantity" style="font-size: 1.2rem; font-weight: bold; text-align: center; padding: 10px; background: #f8f9fa; border-radius: var(--border-radius);">0</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nova Quantidade</label>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" id="decrease-btn">-</button>
+                        <input type="number" class="quantity-input" id="new-quantity" value="0" min="0">
+                        <button class="quantity-btn" id="increase-btn">+</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status do Estoque</label>
+                    <div id="stock-status-preview" class="stock-status in-stock">EM ESTOQUE</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelQuantityBtn">Cancelar</button>
+                <button class="btn btn-primary" id="saveQuantityBtn">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Logout -->
+    <div class="modal" id="logoutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirmar Saída</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja sair do sistema?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelLogoutBtn">Cancelar</button>
+                <button class="btn btn-primary" id="confirmLogoutBtn">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

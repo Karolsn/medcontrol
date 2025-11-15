@@ -1,0 +1,442 @@
+:root {
+    --primary: #2c7fb8;
+    --primary-dark: #1d5a82;
+    --secondary: #7fcdbb;
+    --light: #f0f8ff;
+    --dark: #333;
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --gray: #6c757d;
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: var(--dark);
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+
+.login-container {
+    display: flex;
+    width: 900px;
+    max-width: 95%;
+    min-height: 550px;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.login-left {
+    flex: 1;
+    background: linear-gradient(to bottom right, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-left::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+.logo {
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 1;
+}
+
+.logo h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.logo span {
+    color: var(--secondary);
+}
+
+.logo p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.features {
+    margin-top: 40px;
+    position: relative;
+    z-index: 1;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.feature-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 1.2rem;
+}
+
+.login-right {
+    flex: 1;
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.login-header h2 {
+    font-size: 1.8rem;
+    color: var(--primary-dark);
+    margin-bottom: 10px;
+}
+
+.login-header p {
+    color: var(--gray);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--dark);
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    outline: none;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(44, 127, 184, 0.2);
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+}
+
+.remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+}
+
+.remember-me input {
+    margin-right: 8px;
+}
+
+.forgot-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1rem;
+    width: 100%;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 30px;
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    background: var(--success);
+    color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    z-index: 1100;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast.error {
+    background: var(--danger);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+        width: 95%;
+        max-width: 400px;
+    }
+    
+    .login-left {
+        padding: 30px 20px;
+    }
+    
+    .login-right {
+        padding: 30px 20px;
+    }
+    /* ========== CONTROLE DE TAMANHO DA FONTE ========== */
+.font-size-presets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.font-size-btn {
+    padding: 8px 12px;
+    background-color: #e9ecef;
+    border: 2px solid transparent;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.font-size-btn:hover {
+    background-color: #dee2e6;
+}
+
+.font-size-btn.active {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+}
+
+/* Estilos para diferentes tamanhos de fonte */
+body.font-small {
+    font-size: 14px;
+}
+
+body.font-medium {
+    font-size: 16px;
+}
+
+body.font-large {
+    font-size: 18px;
+}
+
+body.font-xlarge {
+    font-size: 20px;
+}
+
+/* Ajustes específicos para elementos com tamanhos relativos */
+.font-small .page-title {
+    font-size: 1.5rem;
+}
+
+.font-medium .page-title {
+    font-size: 1.8rem;
+}
+
+.font-large .page-title {
+    font-size: 2rem;
+}
+
+.font-xlarge .page-title {
+    font-size: 2.2rem;
+}
+
+.font-small .medicine-name {
+    font-size: 1.1rem;
+}
+
+.font-medium .medicine-name {
+    font-size: 1.3rem;
+}
+
+.font-large .medicine-name {
+    font-size: 1.5rem;
+}
+
+.font-xlarge .medicine-name {
+    font-size: 1.6rem;
+}
+
+/* Ajustes para tema escuro com controle de fonte */
+body.dark-theme .font-size-btn {
+    background-color: #2d2d2d;
+    color: #f0f0f0;
+}
+
+body.dark-theme .font-size-btn:hover {
+    background-color: #3d3d3d;
+}
+
+body.dark-theme .font-size-btn.active {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* Melhorias no slider de range */
+.range-container {
+    padding: 15px 0;
+}
+
+.range-slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: #ddd;
+    outline: none;
+    -webkit-appearance: none;
+    margin: 10px 0;
+}
+
+.range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.range-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--primary);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.range-value {
+    text-align: center;
+    font-weight: 600;
+    color: var(--primary);
+    margin-top: 10px;
+    font-size: 1.1rem;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .font-size-presets {
+        grid-template-columns: 1fr;
+    }
+    
+    .font-small .page-title {
+        font-size: 1.3rem;
+    }
+    
+    .font-medium .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .font-large .page-title {
+        font-size: 1.7rem;
+    }
+    
+    .font-xlarge .page-title {
+        font-size: 1.8rem;
+    }
+}
+}
