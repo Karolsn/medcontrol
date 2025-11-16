@@ -492,9 +492,41 @@ body.dark-theme .range-value {
 .info-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 8px;
     padding-bottom: 8px;
     border-bottom: 1px solid #f0f0f0;
+    gap: 10px;
+}
+
+.info-item .quantity-display {
+    flex: 1;
+}
+
+.btn-edit-quantity {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: var(--transition);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-edit-quantity:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-edit-quantity i {
+    font-size: 0.8rem;
 }
 
 .stock-status {

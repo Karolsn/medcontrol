@@ -1,7 +1,12 @@
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { getMedicamentos, atualizarQuantidadeMedicamento } from './db.js';
 
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = 3000;
 
@@ -22,9 +27,6 @@ const usuarios = [
 	{ username: 'usuario', password: 'senha' }
 ];
 
-// Simulação de medicamentos (pode ser expandido)
-const medicamentos = require('./medicamentos');
-
 // Rota de login
 app.post('/api/login', (req, res) => {
 	const { username, password } = req.body;
@@ -37,8 +39,39 @@ app.post('/api/login', (req, res) => {
 });
 
 // Rota para consulta de medicamentos
-app.get('/api/medicamentos', (req, res) => {
-	res.json(medicamentos);
+app.get('/api/medicamentos', async (req, res) => {
+	try {
+		const meds = await getMedicamentos();
+		res.json(meds);
+	} catch (err) {
+		res.status(500).json({ error: 'Erro ao consultar medicamentos.' });
+	}
+});
+
+// Rota para atualizar quantidade de medicamento
+app.patch('/api/medicamentos/quantidade', async (req, res) => {
+	const { nome, quantidade } = req.body;
+	
+	console.log('Recebida requisição para atualizar:', { nome, quantidade });
+	
+	if (!nome || quantidade === undefined) {
+		return res.status(400).json({ success: false, error: 'Nome e quantidade obrigatórios.' });
+	}
+	
+	try {
+		const medicamentoAtualizado = await atualizarQuantidadeMedicamento(nome, quantidade);
+		console.log('Medicamento atualizado com sucesso:', medicamentoAtualizado);
+		res.json({ 
+			success: true, 
+			medicamento: medicamentoAtualizado 
+		});
+	} catch (err) {
+		console.error('Erro ao atualizar quantidade:', err);
+		res.status(500).json({ 
+			success: false, 
+			error: err.message || 'Erro ao atualizar quantidade.' 
+		});
+	}
 });
 
 app.listen(PORT, () => {

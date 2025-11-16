@@ -12,7 +12,23 @@ function fetchMedicamentos(callback) {
             }
         })
         .then(function(data) {
-            medicamentos = data;
+            // Corrigir caso venha com .default
+            if (data && data.default) {
+                medicamentos = data.default;
+            } else {
+                medicamentos = data;
+            }
+            
+            // Normalizar status dos medicamentos do banco de dados
+            for (const categoria in medicamentos) {
+                if (Array.isArray(medicamentos[categoria])) {
+                    medicamentos[categoria] = medicamentos[categoria].map(med => ({
+                        ...med,
+                        status: normalizeStatus(med.status)
+                    }));
+                }
+            }
+            
             if (typeof callback === 'function') callback();
         })
         .catch(function(error) {
@@ -20,26 +36,95 @@ function fetchMedicamentos(callback) {
         });
 }
 
+// Funções auxiliares
+function getStatusText(status) {
+    const statusTexts = {
+        'in-stock': 'EM ESTOQUE',
+        'low-stock': 'ESTOQUE BAIXO',
+        'out-of-stock': 'FORA DE ESTOQUE'
+    };
+    return statusTexts[status] || 'DESCONHECIDO';
+}
+
+function getCategoryName(categoryKey) {
+    const categoryNames = {
+        'analgesicos': 'Analgésicos e Sedativos',
+        'antibioticos': 'Antibióticos',
+        'cardiovasculares': 'Cardiovasculares',
+        'solucoes': 'Soluções e Eletrólitos',
+        'anticoagulantes': 'Anticoagulantes',
+        'anticonvulsivantes': 'Anticonvulsivantes',
+        'corticoides': 'Corticoides',
+        'antiemeticos': 'Antieméticos',
+        'outros': 'Outros Essenciais'
+    };
+    return categoryNames[categoryKey] || 'Medicamento';
+}
+
 // Função para renderizar os medicamentos na tela
 function renderMedicines(category = 'all', searchTerm = '') {
-    if (!medicinesContainer) return;
-    medicinesContainer.innerHTML = '';
+    console.log('Medicamentos carregados:', medicamentos);
+    if (!window.medicinesContainer) {
+        console.error('Container de medicamentos não encontrado');
+        return;
+    }
+    
+    window.medicinesContainer.innerHTML = '';
+    
+    // Verificar se há medicamentos
+    if (!medicamentos || Object.keys(medicamentos).length === 0) {
+        window.medicinesContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <i class="fas fa-pills" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                <h3>Nenhum medicamento encontrado</h3>
+                <p>Os medicamentos serão exibidos aqui quando disponíveis.</p>
+            </div>
+        `;
+        return;
+    }
+    
     let medicinesToShow = [];
     if (category === 'all') {
         for (const cat in medicamentos) {
-            medicinesToShow = medicinesToShow.concat(medicamentos[cat]);
+            if (Array.isArray(medicamentos[cat])) {
+                medicinesToShow = medicinesToShow.concat(medicamentos[cat]);
+            }
         }
     } else {
-        medicinesToShow = medicamentos[category] || [];
+        medicinesToShow = Array.isArray(medicamentos[category]) ? medicamentos[category] : [];
     }
+    
     if (searchTerm) {
         medicinesToShow = medicinesToShow.filter(function(med) {
-            return med.nome.toLowerCase().includes(searchTerm.toLowerCase());
+            return med.nome && med.nome.toLowerCase().includes(searchTerm.toLowerCase());
         });
+    }
+    
+    if (medicinesToShow.length === 0) {
+        window.medicinesContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
+                <h3>Nenhum medicamento encontrado</h3>
+                <p>Tente ajustar os filtros de busca ou categoria.</p>
+            </div>
+        `;
+        return;
     }
     medicinesToShow.forEach(function(med) {
         var medicineCard = document.createElement('div');
         medicineCard.className = 'medicine-card';
+        
+        // Encontrar a categoria do medicamento
+        let medCategory = category;
+        if (category === 'all') {
+            for (const cat in medicamentos) {
+                if (medicamentos[cat].some(m => m.nome === med.nome)) {
+                    medCategory = cat;
+                    break;
+                }
+            }
+        }
+        
         medicineCard.innerHTML = `
             <div class="medicine-header">
                 <h3 class="medicine-name">${med.nome}</h3>
@@ -53,77 +138,222 @@ function renderMedicines(category = 'all', searchTerm = '') {
                     </div>
                     <div class="info-item">
                         <span class="info-label">Quantidade:</span>
-                        <span>${med.quantidade} unidades</span>
+                        <span class="quantity-display">${med.quantidade} unidades</span>
+                        <button class="btn btn-sm btn-edit-quantity" data-medicine='${JSON.stringify(med).replace(/'/g, "&#39;")}' data-category="${medCategory}">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Status:</span>
-                        <span>${med.status}</span>
+                        <span class="stock-status ${med.status}">${getStatusText(med.status)}</span>
                     </div>
                 </div>
             </div>
         `;
-        medicinesContainer.appendChild(medicineCard);
+        window.medicinesContainer.appendChild(medicineCard);
+        
+        // Adicionar event listener ao botão de editar
+        const editBtn = medicineCard.querySelector('.btn-edit-quantity');
+        if (editBtn) {
+            editBtn.addEventListener('click', function() {
+                const medicineData = JSON.parse(this.getAttribute('data-medicine'));
+                openQuantityModal(medicineData, medicineCard);
+            });
+        }
     });
 }
 
 // Inicialização dinâmica ao carregar medicamentos e navegação
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar variáveis do modal de quantidade
+    quantityModal = document.getElementById('quantityModal');
+    decreaseBtn = document.getElementById('decrease-btn');
+    increaseBtn = document.getElementById('increase-btn');
+    newQuantityInput = document.getElementById('new-quantity');
+    currentQuantityDisplay = document.getElementById('current-quantity');
+    stockStatusPreview = document.getElementById('stock-status-preview');
+    quantityModalTitle = document.getElementById('quantityModalTitle');
+    saveQuantityBtn = document.getElementById('saveQuantityBtn');
+    cancelQuantityBtn = document.getElementById('cancelQuantityBtn');
+    
+    // Inicializar outras variáveis
+    logoutModal = document.getElementById('logoutModal');
+    toast = document.getElementById('toast');
+    logoutBtn = document.getElementById('logout-btn');
+    cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+    confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+    clearFormBtn = document.getElementById('clear-form');
+    saveProntuarioBtn = document.getElementById('save-prontuario');
+    
+    // Inicializar variáveis globais após DOM pronto
+    window.medicinesContainer = document.getElementById('medicines-container');
+    navLinks = document.querySelectorAll('.nav-link');
+    pageContents = document.querySelectorAll('.page-content');
+    pageTitle = document.getElementById('pageTitle');
+    categoryButtons = document.querySelectorAll('.category-btn');
+    searchInput = document.querySelector('.search-input');
+    
+    // Tornar pageTitles acessível globalmente
+    window.pageTitles = pageTitles;
+
     fetchMedicamentos(function() {
         renderMedicines();
     });
+    
+    // Controles de quantidade no modal
+    if (decreaseBtn) {
+        decreaseBtn.addEventListener('click', function() {
+            const currentValue = parseInt(newQuantityInput.value);
+            if (currentValue > 0) {
+                newQuantityInput.value = currentValue - 1;
+                updateStockStatusPreview(newQuantityInput.value);
+            }
+        });
+    }
 
-    // Ativação dos botões de categoria
-    document.querySelectorAll('.category-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.category-btn').forEach(function(b) { b.classList.remove('active'); });
-            btn.classList.add('active');
-            var category = btn.getAttribute('data-category');
-            renderMedicines(category);
+    if (increaseBtn) {
+        increaseBtn.addEventListener('click', function() {
+            const currentValue = parseInt(newQuantityInput.value);
+            newQuantityInput.value = currentValue + 1;
+            updateStockStatusPreview(newQuantityInput.value);
+        });
+    }
+
+    if (newQuantityInput) {
+        newQuantityInput.addEventListener('input', function() {
+            updateStockStatusPreview(this.value);
+        });
+    }
+
+    // Salvar quantidade
+    if (saveQuantityBtn) {
+        saveQuantityBtn.addEventListener('click', saveQuantity);
+    }
+
+    // Cancelar alteração de quantidade
+    if (cancelQuantityBtn) {
+        cancelQuantityBtn.addEventListener('click', function() {
+            if (quantityModal) {
+                quantityModal.style.display = 'none';
+            }
+        });
+    }
+    
+    // Funcionalidade do botão Sair
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            if (logoutModal) {
+                logoutModal.style.display = 'flex';
+            }
+        });
+    }
+
+    if (cancelLogoutBtn) {
+        cancelLogoutBtn.addEventListener('click', function() {
+            if (logoutModal) {
+                logoutModal.style.display = 'none';
+            }
+        });
+    }
+
+    if (confirmLogoutBtn) {
+        confirmLogoutBtn.addEventListener('click', function() {
+            if (logoutModal) {
+                logoutModal.style.display = 'none';
+            }
+            showToast('Saindo do sistema...', 'warning');
+            
+            setTimeout(() => {
+                alert('Você foi desconectado do sistema. Redirecionando para a página de login...');
+            }, 2000);
+        });
+    }
+
+    // Limpar formulário
+    if (clearFormBtn) {
+        clearFormBtn.addEventListener('click', function() {
+            if (confirm('Tem certeza que deseja limpar todos os campos do prontuário?')) {
+                limparFormularioProntuario();
+                showToast('Formulário limpo!', 'success');
+            }
+        });
+    }
+
+    // Fechar modais
+    const closeButtons = document.querySelectorAll('.close-btn');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
         });
     });
+    
+    // Fechar modal ao clicar fora dele
+    window.addEventListener('click', function(event) {
+        if (event.target === logoutModal) {
+            logoutModal.style.display = 'none';
+        }
+        if (event.target === quantityModal) {
+            quantityModal.style.display = 'none';
+        }
+    });
+
+    // Ativação dos botões de categoria
+    if (categoryButtons && categoryButtons.length > 0) {
+        categoryButtons.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                categoryButtons.forEach(function(b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                currentCategory = btn.getAttribute('data-category');
+                renderMedicines(currentCategory, searchInput ? searchInput.value : '');
+            });
+        });
+    }
 
     // Ativação do filtro de busca
-    var searchInput = document.querySelector('.search-input');
     if (searchInput) {
         searchInput.addEventListener('input', function() {
-            var activeCategory = document.querySelector('.category-btn.active').getAttribute('data-category');
+            var activeCategory = 'all';
+            var activeBtn = document.querySelector('.category-btn.active');
+            if (activeBtn) {
+                activeCategory = activeBtn.getAttribute('data-category');
+            }
             renderMedicines(activeCategory, searchInput.value);
         });
     }
 
     // Navegação entre páginas
-    document.querySelectorAll('.nav-link').forEach(function(link) {
-        link.addEventListener('click', function() {
-            if (link.id === 'logout-btn') {
-                document.getElementById('logoutModal').style.display = 'flex';
-                return;
-            }
-            var page = link.getAttribute('data-page');
-            document.querySelectorAll('.nav-link').forEach(function(l) { l.classList.remove('active'); });
-            link.classList.add('active');
-            document.querySelectorAll('.page-content').forEach(function(content) { content.classList.remove('active'); });
-            var pageDiv = document.getElementById(page + '-page');
-            if (pageDiv) {
-                pageDiv.classList.add('active');
-                var pageTitle = document.getElementById('pageTitle');
-                if (pageTitle && window.pageTitles && window.pageTitles[page]) {
-                    pageTitle.textContent = window.pageTitles[page];
+    if (navLinks && navLinks.length > 0) {
+        navLinks.forEach(function(link) {
+            link.addEventListener('click', function(event) {
+                if (link.id === 'logout-btn') {
+                    if (logoutModal) {
+                        logoutModal.style.display = 'flex';
+                    }
+                    return;
                 }
-            }
+
+                event.preventDefault();
+                var page = link.getAttribute('data-page');
+                if (!page) return;
+
+                navegarParaPagina(page);
+            });
         });
-    });
+    }
 });
-const decreaseBtn = document.getElementById('decrease-btn');
-const increaseBtn = document.getElementById('increase-btn');
-const newQuantityInput = document.getElementById('new-quantity');
-const currentQuantityDisplay = document.getElementById('current-quantity');
-const stockStatusPreview = document.getElementById('stock-status-preview');
-const quantityModalTitle = document.getElementById('quantityModalTitle');
+// Variáveis do modal de quantidade (serão inicializadas no DOMContentLoaded)
+let decreaseBtn, increaseBtn, newQuantityInput, currentQuantityDisplay;
+let stockStatusPreview, quantityModalTitle, quantityModal;
+let saveQuantityBtn, cancelQuantityBtn;
 
 // Variáveis globais
 let currentCategory = 'all';
 let currentMedicine = null;
 let currentMedicineElement = null;
+let navLinks, pageContents, pageTitle, categoryButtons, searchInput;
 
 // Títulos das páginas
 const pageTitles = {
@@ -133,6 +363,21 @@ const pageTitles = {
     'checklist': 'Checklist de Plantão - Passagem',
     'configuracoes': 'Configurações do Sistema'
 };
+
+// Função para normalizar status do banco de dados
+function normalizeStatus(status) {
+    if (!status) return 'in-stock';
+    
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes('estoque') && !statusLower.includes('baixo') && !statusLower.includes('fora')) {
+        return 'in-stock';
+    } else if (statusLower.includes('baixo')) {
+        return 'low-stock';
+    } else if (statusLower.includes('fora')) {
+        return 'out-of-stock';
+    }
+    return 'in-stock';
+}
 
 // DADOS INICIAIS PARA DEMONSTRAÇÃO
 let teamMembers = [
@@ -208,14 +453,19 @@ function salvarProntuario() {
     // Salvar no localStorage
     localStorage.setItem('prontuariosSalvos', JSON.stringify(prontuariosSalvos));
     
-    // Atualizar a lista de prontuários salvos
-    renderProntuariosSalvos();
+    console.log('Prontuário salvo:', prontuario);
+    console.log('Total de prontuários salvos:', prontuariosSalvos.length);
     
     // Limpar formulário
     limparFormularioProntuario();
     
-    // Navegar para a página de prontuários salvos
+    // Navegar para a página de prontuários salvos (isso já chama renderProntuariosSalvos)
     navegarParaPagina('prontuarios-salvos');
+    
+    // Garantir que a renderização aconteça após um pequeno delay para garantir que o DOM está pronto
+    setTimeout(() => {
+        renderProntuariosSalvos();
+    }, 100);
     
     showToast('Prontuário salvo com sucesso!', 'success');
 }
@@ -243,40 +493,75 @@ function limparFormularioProntuario() {
 }
 
 // Renderizar prontuários salvos
-function renderProntuariosSalvos() {
+function renderProntuariosSalvos(attempt = 0) {
+    // Tenta encontrar os elementos
     const prontuariosGrid = document.getElementById('prontuarios-grid');
     const emptyState = document.getElementById('empty-prontuarios');
+    const pageActive = document.querySelector('#prontuarios-salvos-page.active');
     
-    if (!prontuariosGrid) return;
+    // Verifica se a página está ativa e se os elementos existem
+    if (!pageActive || !prontuariosGrid) {
+        if (attempt < 10) { // Tenta até 10 vezes com intervalo de 100ms
+            console.log(`Aguardando carregamento da página de prontuários... (tentativa ${attempt + 1})`);
+            setTimeout(() => renderProntuariosSalvos(attempt + 1), 100);
+            return;
+        } else {
+            console.error('Elemento prontuarios-grid não encontrado no DOM após várias tentativas');
+            return;
+        }
+    }
+    
+    // Recarregar do localStorage para garantir que temos os dados mais recentes
+    const prontuariosSalvosAtualizados = JSON.parse(localStorage.getItem('prontuariosSalvos')) || [];
+    prontuariosSalvos = prontuariosSalvosAtualizados;
+    
+    console.log('Renderizando prontuários. Total:', prontuariosSalvos.length);
     
     prontuariosGrid.innerHTML = '';
     
     if (prontuariosSalvos.length === 0) {
-        emptyState.style.display = 'block';
+        if (emptyState) {
+            emptyState.style.display = 'block';
+        }
         return;
     }
     
-    emptyState.style.display = 'none';
+    if (emptyState) {
+        emptyState.style.display = 'none';
+    }
     
-    prontuariosSalvos.forEach(prontuario => {
+    prontuariosSalvos.forEach((prontuario, index) => {
         const prontuarioCard = document.createElement('div');
         prontuarioCard.className = 'prontuario-card';
+        
+        // Função auxiliar para escapar HTML
+        const escapeHtml = (text) => {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        };
+        
+        const nomePaciente = escapeHtml(prontuario.paciente?.nome || 'Sem nome');
+        const infoPaciente = escapeHtml(prontuario.paciente?.info || 'Sem informações adicionais');
+        const dataFormatada = formatarData(prontuario.dataCriacao);
+        const historico = prontuario.historico ? escapeHtml(prontuario.historico.substring(0, 100)) + (prontuario.historico.length > 100 ? '...' : '') : 'Sem histórico registrado';
+        const diagnostico = prontuario.diagnostico ? escapeHtml(prontuario.diagnostico.substring(0, 80)) + (prontuario.diagnostico.length > 80 ? '...' : '') : '';
+        
         prontuarioCard.innerHTML = `
             <div class="prontuario-header">
                 <div class="prontuario-paciente">
-                    <div class="prontuario-nome">${prontuario.paciente.nome}</div>
-                    <div class="prontuario-info">${prontuario.paciente.info || 'Sem informações adicionais'}</div>
+                    <div class="prontuario-nome">${nomePaciente}</div>
+                    <div class="prontuario-info">${infoPaciente}</div>
                 </div>
-                <div class="prontuario-data">${formatarData(prontuario.dataCriacao)}</div>
+                <div class="prontuario-data">${dataFormatada}</div>
             </div>
             
             <div class="prontuario-content">
-                <div class="prontuario-resumo">
-                    ${prontuario.historico ? (prontuario.historico.substring(0, 100) + '...') : 'Sem histórico registrado'}
-                </div>
-                ${prontuario.diagnostico ? `
+                <div class="prontuario-resumo">${historico}</div>
+                ${diagnostico ? `
                     <div class="prontuario-diagnostico">
-                        <strong>Diagnóstico:</strong> ${prontuario.diagnostico.substring(0, 80)}${prontuario.diagnostico.length > 80 ? '...' : ''}
+                        <strong>Diagnóstico:</strong> ${diagnostico}
                     </div>
                 ` : ''}
             </div>
@@ -294,7 +579,11 @@ function renderProntuariosSalvos() {
             </div>
         `;
         prontuariosGrid.appendChild(prontuarioCard);
+        
+        console.log(`Prontuário ${index + 1} renderizado:`, prontuario.paciente?.nome);
     });
+    
+    console.log(`Total de ${prontuariosSalvos.length} prontuário(s) renderizado(s)`);
 }
 
 // Visualizar prontuário
@@ -840,93 +1129,17 @@ function updateCurrentDate() {
 }
 
 function loadMedicines(category = 'all', searchTerm = '') {
-    if (!medicinesContainer) return;
-    
-    medicinesContainer.innerHTML = '';
-    
-    let medicinesToShow = [];
-    
-    if (category === 'all') {
-        for (const cat in medicamentos) {
-            medicinesToShow = medicinesToShow.concat(medicamentos[cat]);
-        }
-    } else {
-        medicinesToShow = medicamentos[category] || [];
-    }
-    
-    if (searchTerm) {
-        medicinesToShow = medicinesToShow.filter(med => 
-            med.nome.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }
-    
-    medicinesToShow.forEach(med => {
-        const medicineCard = document.createElement('div');
-        medicineCard.className = 'medicine-card';
-        medicineCard.innerHTML = `
-            <div class="medicine-header">
-                <h3 class="medicine-name">${med.nome}</h3>
-                <span class="medicine-category">${getCategoryName(category)}</span>
-            </div>
-            <div class="medicine-body">
-                <div class="medicine-info">
-                    <div class="info-item">
-                        <span class="info-label">Uso:</span>
-                        <span>${med.uso}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Quantidade:</span>
-                        <span>${med.quantidade} unidades</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Status:</span>
-                        <span class="stock-status ${med.status}">${getStatusText(med.status)}</span>
-                    </div>
-                </div>
-                <div class="medicine-actions">
-                    <button class="btn btn-primary edit-quantity" data-medicine='${JSON.stringify(med)}'>
-                        <i class="fas fa-edit"></i>
-                        Alterar Quantidade
-                    </button>
-                </div>
-            </div>
-        `;
-        medicinesContainer.appendChild(medicineCard);
-    });
-    
-    document.querySelectorAll('.edit-quantity').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const medicineData = JSON.parse(this.getAttribute('data-medicine'));
-            openQuantityModal(medicineData, this.closest('.medicine-card'));
-        });
-    });
+    // Usar a mesma função renderMedicines para manter consistência
+    renderMedicines(category, searchTerm);
 }
 
-function getCategoryName(categoryKey) {
-    const categoryNames = {
-        'analgesicos': 'Analgésicos e Sedativos',
-        'antibioticos': 'Antibióticos',
-        'cardiovasculares': 'Cardiovasculares',
-        'solucoes': 'Soluções e Eletrólitos',
-        'anticoagulantes': 'Anticoagulantes',
-        'anticonvulsivantes': 'Anticonvulsivantes',
-        'corticoides': 'Corticoides',
-        'antiemeticos': 'Antieméticos',
-        'outros': 'Outros Essenciais'
-    };
-    return categoryNames[categoryKey] || 'Medicamento';
-}
-
-function getStatusText(status) {
-    const statusTexts = {
-        'in-stock': 'EM ESTOQUE',
-        'low-stock': 'ESTOQUE BAIXO',
-        'out-of-stock': 'FORA DE ESTOQUE'
-    };
-    return statusTexts[status] || 'DESCONHECIDO';
-}
 
 function openQuantityModal(medicine, medicineElement) {
+    if (!quantityModal || !quantityModalTitle || !currentQuantityDisplay || !newQuantityInput) {
+        console.error('Modal de quantidade não está inicializado');
+        return;
+    }
+    
     currentMedicine = medicine;
     currentMedicineElement = medicineElement;
     
@@ -940,6 +1153,8 @@ function openQuantityModal(medicine, medicineElement) {
 }
 
 function updateStockStatusPreview(quantity) {
+    if (!stockStatusPreview) return;
+    
     let status, text;
     
     if (quantity === 0) {
@@ -958,6 +1173,11 @@ function updateStockStatusPreview(quantity) {
 }
 
 function saveQuantity() {
+    if (!newQuantityInput || !currentMedicine) {
+        console.error('Elementos necessários não estão disponíveis');
+        return;
+    }
+    
     const newQuantity = parseInt(newQuantityInput.value);
     
     if (isNaN(newQuantity) || newQuantity < 0) {
@@ -965,29 +1185,90 @@ function saveQuantity() {
         return;
     }
     
-    currentMedicine.quantidade = newQuantity;
+    // Atualizar no backend
+    console.log('Enviando atualização:', { nome: currentMedicine.nome, quantidade: newQuantity });
     
-    if (newQuantity === 0) {
-        currentMedicine.status = 'out-of-stock';
-    } else if (newQuantity < 50) {
-        currentMedicine.status = 'low-stock';
-    } else {
-        currentMedicine.status = 'in-stock';
-    }
-    
-    const quantityDisplay = currentMedicineElement.querySelector('.info-item:nth-child(2) span:last-child');
-    const statusDisplay = currentMedicineElement.querySelector('.stock-status');
-    
-    quantityDisplay.textContent = `${newQuantity} unidades`;
-    statusDisplay.className = `stock-status ${currentMedicine.status}`;
-    statusDisplay.textContent = getStatusText(currentMedicine.status);
-    
-    showToast('Quantidade atualizada com sucesso!', 'success');
-    quantityModal.style.display = 'none';
+    fetch('/api/medicamentos/quantidade', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            nome: currentMedicine.nome, 
+            quantidade: newQuantity 
+        })
+    })
+    .then(res => {
+        console.log('Resposta do servidor:', res.status);
+        if (!res.ok) {
+            return res.json().then(err => Promise.reject(err));
+        }
+        return res.json();
+    })
+    .then(data => {
+        console.log('Dados recebidos:', data);
+        if (data.success) {
+            // Atualizar localmente no objeto medicamentos
+            const categoriaEncontrada = Object.keys(medicamentos).find(cat => 
+                medicamentos[cat] && medicamentos[cat].some(m => m.nome === currentMedicine.nome)
+            );
+            
+            if (categoriaEncontrada) {
+                const medIndex = medicamentos[categoriaEncontrada].findIndex(m => m.nome === currentMedicine.nome);
+                if (medIndex !== -1) {
+                    medicamentos[categoriaEncontrada][medIndex].quantidade = newQuantity;
+                    
+                    // Atualizar status
+                    if (newQuantity === 0) {
+                        medicamentos[categoriaEncontrada][medIndex].status = 'out-of-stock';
+                    } else if (newQuantity < 50) {
+                        medicamentos[categoriaEncontrada][medIndex].status = 'low-stock';
+                    } else {
+                        medicamentos[categoriaEncontrada][medIndex].status = 'in-stock';
+                    }
+                }
+            }
+            
+            // Atualizar no objeto currentMedicine
+            currentMedicine.quantidade = newQuantity;
+            if (newQuantity === 0) {
+                currentMedicine.status = 'out-of-stock';
+            } else if (newQuantity < 50) {
+                currentMedicine.status = 'low-stock';
+            } else {
+                currentMedicine.status = 'in-stock';
+            }
+            
+            // Atualizar na interface
+            const quantityDisplay = currentMedicineElement.querySelector('.quantity-display');
+            const statusDisplay = currentMedicineElement.querySelector('.stock-status');
+            
+            if (quantityDisplay) {
+                quantityDisplay.textContent = `${newQuantity} unidades`;
+            }
+            if (statusDisplay) {
+                statusDisplay.className = `stock-status ${currentMedicine.status}`;
+                statusDisplay.textContent = getStatusText(currentMedicine.status);
+            }
+            
+            showToast('Quantidade atualizada com sucesso no banco de dados!', 'success');
+            quantityModal.style.display = 'none';
+        } else {
+            showToast(data.error || 'Erro ao atualizar quantidade. Tente novamente.', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao atualizar quantidade:', error);
+        const errorMessage = error.error || error.message || 'Erro ao atualizar quantidade. Tente novamente.';
+        showToast(errorMessage, 'error');
+    });
 }
 
 // Navegação entre páginas
 function navegarParaPagina(pagina) {
+    if (!navLinks || !pageContents || !pageTitle) {
+        console.error('Variáveis de navegação não inicializadas');
+        return;
+    }
+    
     // Remove active de todos os links e páginas
     navLinks.forEach(l => l.classList.remove('active'));
     pageContents.forEach(page => page.classList.remove('active'));
@@ -999,36 +1280,43 @@ function navegarParaPagina(pagina) {
     }
     
     // Mostra a página correspondente
-    document.getElementById(`${pagina}-page`).classList.add('active');
+    const pageDiv = document.getElementById(`${pagina}-page`);
+    if (pageDiv) {
+        pageDiv.classList.add('active');
+    }
     
     // Atualiza o título da página
-    pageTitle.textContent = pageTitles[pagina];
+    if (pageTitles[pagina]) {
+        pageTitle.textContent = pageTitles[pagina];
+    }
     
     // Se for a página de prontuários salvos, renderiza os prontuários
     if (pagina === 'prontuarios-salvos') {
-        renderProntuariosSalvos();
+        // Pequeno delay para garantir que o DOM está pronto
+        setTimeout(() => {
+            renderProntuariosSalvos();
+        }, 50);
     }
     
-    showToast(`Acessando ${pageTitles[pagina]}`, 'success');
+    if (toast) {
+        showToast(`Acessando ${pageTitles[pagina] || pagina}`, 'success');
+    }
 }
-
-// Adiciona event listeners de navegação
-navLinks.forEach(link => {
-    link.addEventListener('click', function() {
-        if (this.id === 'logout-btn') {
-            logoutModal.style.display = 'flex';
-            return;
-        }
-        
-        const pageId = this.getAttribute('data-page');
-        navegarParaPagina(pageId);
-    });
-});
 
 // Adiciona item de menu para Prontuários Salvos
 function adicionarMenuItemProntuariosSalvos() {
     const navMenu = document.querySelector('.nav-menu');
-    const itemChecklist = document.querySelector('.nav-item [data-page="checklist"]').closest('.nav-item');
+    if (!navMenu) return;
+    
+    const itemChecklist = document.querySelector('.nav-item [data-page="checklist"]');
+    if (!itemChecklist) return;
+    
+    const itemChecklistParent = itemChecklist.closest('.nav-item');
+    if (!itemChecklistParent) return;
+    
+    // Verificar se o item já existe
+    const existingItem = document.querySelector('.nav-item [data-page="prontuarios-salvos"]');
+    if (existingItem) return;
     
     const novoItem = document.createElement('li');
     novoItem.className = 'nav-item';
@@ -1039,92 +1327,20 @@ function adicionarMenuItemProntuariosSalvos() {
         </a>
     `;
     
-    navMenu.insertBefore(novoItem, itemChecklist.nextSibling);
+    navMenu.insertBefore(novoItem, itemChecklistParent.nextSibling);
     
     // Adiciona event listener ao novo item
-    novoItem.querySelector('.nav-link').addEventListener('click', function() {
-        navegarParaPagina('prontuarios-salvos');
-    });
+    const novoLink = novoItem.querySelector('.nav-link');
+    if (novoLink) {
+        novoLink.addEventListener('click', function() {
+            navegarParaPagina('prontuarios-salvos');
+        });
+    }
 }
 
-// Filtros de categoria
-categoryButtons.forEach(button => {
-    button.addEventListener('click', function() {
-        categoryButtons.forEach(btn => btn.classList.remove('active'));
-        this.classList.add('active');
-        
-        currentCategory = this.getAttribute('data-category');
-        loadMedicines(currentCategory, searchInput.value);
-    });
-});
-
-// Pesquisa
-if (searchInput) {
-    searchInput.addEventListener('input', function() {
-        loadMedicines(currentCategory, this.value);
-    });
-}
-
-// Controles de quantidade no modal
-decreaseBtn.addEventListener('click', function() {
-    const currentValue = parseInt(newQuantityInput.value);
-    if (currentValue > 0) {
-        newQuantityInput.value = currentValue - 1;
-        updateStockStatusPreview(newQuantityInput.value);
-    }
-});
-
-increaseBtn.addEventListener('click', function() {
-    const currentValue = parseInt(newQuantityInput.value);
-    newQuantityInput.value = currentValue + 1;
-    updateStockStatusPreview(newQuantityInput.value);
-});
-
-newQuantityInput.addEventListener('input', function() {
-    updateStockStatusPreview(this.value);
-});
-
-// Salvar quantidade
-saveQuantityBtn.addEventListener('click', saveQuantity);
-
-// Cancelar alteração de quantidade
-cancelQuantityBtn.addEventListener('click', function() {
-    quantityModal.style.display = 'none';
-});
-
-// Funcionalidade do botão Sair
-logoutBtn.addEventListener('click', function() {
-    logoutModal.style.display = 'flex';
-});
-
-cancelLogoutBtn.addEventListener('click', function() {
-    logoutModal.style.display = 'none';
-});
-
-confirmLogoutBtn.addEventListener('click', function() {
-    logoutModal.style.display = 'none';
-    showToast('Saindo do sistema...', 'warning');
-    
-    setTimeout(() => {
-        alert('Você foi desconectado do sistema. Redirecionando para a página de login...');
-    }, 2000);
-});
-
-// Limpar formulário
-clearFormBtn.addEventListener('click', function() {
-    if (confirm('Tem certeza que deseja limpar todos os campos do prontuário?')) {
-        limparFormularioProntuario();
-        showToast('Formulário limpo!', 'success');
-    }
-});
-
-// Fechar modais
-closeButtons.forEach(button => {
-    button.addEventListener('click', function() {
-        logoutModal.style.display = 'none';
-        quantityModal.style.display = 'none';
-    });
-});
+// Variáveis adicionais que serão inicializadas no DOMContentLoaded
+let logoutModal, toast, logoutBtn, cancelLogoutBtn, confirmLogoutBtn;
+let clearFormBtn, saveProntuarioBtn;
 
 // Função para mostrar notificações toast
 function showToast(message, type = 'success') {
@@ -1149,15 +1365,6 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// Fechar modal ao clicar fora dele
-window.addEventListener('click', function(event) {
-    if (event.target === logoutModal) {
-        logoutModal.style.display = 'none';
-    }
-    if (event.target === quantityModal) {
-        quantityModal.style.display = 'none';
-    }
-});
 
 // Funcionalidade do prontuário
 const startConsultationBtn = document.getElementById('startConsultationBtn');
@@ -1430,6 +1637,113 @@ document.addEventListener('DOMContentLoaded', function() {
     // Adicionar item de menu para Prontuários Salvos
     adicionarMenuItemProntuariosSalvos();
     
+    // Carregar prontuários salvos do localStorage
+    prontuariosSalvos = JSON.parse(localStorage.getItem('prontuariosSalvos')) || [];
+    
+    // Se estiver na página de prontuários salvos, renderizar
+    const prontuariosPage = document.getElementById('prontuarios-salvos-page');
+    if (prontuariosPage && prontuariosPage.classList.contains('active')) {
+        renderProntuariosSalvos();
+    }
+    
+    // Adicionar funcionalidade de busca para prontuários salvos
+    const searchProntuariosInput = document.getElementById('search-prontuarios');
+    if (searchProntuariosInput) {
+        searchProntuariosInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            const prontuariosGrid = document.getElementById('prontuarios-grid');
+            const emptyState = document.getElementById('empty-prontuarios');
+            
+            if (!prontuariosGrid) return;
+            
+            if (!searchTerm) {
+                renderProntuariosSalvos();
+                return;
+            }
+            
+            const prontuariosFiltrados = prontuariosSalvos.filter(prontuario => {
+                const nome = (prontuario.paciente?.nome || '').toLowerCase();
+                const info = (prontuario.paciente?.info || '').toLowerCase();
+                const historico = (prontuario.historico || '').toLowerCase();
+                const diagnostico = (prontuario.diagnostico || '').toLowerCase();
+                
+                return nome.includes(searchTerm) || 
+                       info.includes(searchTerm) || 
+                       historico.includes(searchTerm) || 
+                       diagnostico.includes(searchTerm);
+            });
+            
+            prontuariosGrid.innerHTML = '';
+            
+            if (prontuariosFiltrados.length === 0) {
+                if (emptyState) {
+                    emptyState.style.display = 'block';
+                    emptyState.innerHTML = `
+                        <i class="fas fa-search"></i>
+                        <h3>Nenhum prontuário encontrado</h3>
+                        <p>Nenhum prontuário corresponde à busca "${searchTerm}"</p>
+                    `;
+                }
+                return;
+            }
+            
+            if (emptyState) {
+                emptyState.style.display = 'none';
+            }
+            
+            // Renderizar prontuários filtrados
+            prontuariosFiltrados.forEach((prontuario, index) => {
+                const prontuarioCard = document.createElement('div');
+                prontuarioCard.className = 'prontuario-card';
+                
+                const escapeHtml = (text) => {
+                    if (!text) return '';
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
+                };
+                
+                const nomePaciente = escapeHtml(prontuario.paciente?.nome || 'Sem nome');
+                const infoPaciente = escapeHtml(prontuario.paciente?.info || 'Sem informações adicionais');
+                const dataFormatada = formatarData(prontuario.dataCriacao);
+                const historico = prontuario.historico ? escapeHtml(prontuario.historico.substring(0, 100)) + (prontuario.historico.length > 100 ? '...' : '') : 'Sem histórico registrado';
+                const diagnostico = prontuario.diagnostico ? escapeHtml(prontuario.diagnostico.substring(0, 80)) + (prontuario.diagnostico.length > 80 ? '...' : '') : '';
+                
+                prontuarioCard.innerHTML = `
+                    <div class="prontuario-header">
+                        <div class="prontuario-paciente">
+                            <div class="prontuario-nome">${nomePaciente}</div>
+                            <div class="prontuario-info">${infoPaciente}</div>
+                        </div>
+                        <div class="prontuario-data">${dataFormatada}</div>
+                    </div>
+                    
+                    <div class="prontuario-content">
+                        <div class="prontuario-resumo">${historico}</div>
+                        ${diagnostico ? `
+                            <div class="prontuario-diagnostico">
+                                <strong>Diagnóstico:</strong> ${diagnostico}
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="prontuario-actions">
+                        <button class="btn btn-sm btn-view" onclick="visualizarProntuario(${prontuario.id})">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="imprimirProntuarioSalvo(${prontuario.id})">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
+                        <button class="btn btn-sm btn-delete" onclick="deletarProntuario(${prontuario.id})">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    </div>
+                `;
+                prontuariosGrid.appendChild(prontuarioCard);
+            });
+        });
+    }
+    
     // Inicializar funcionalidades básicas
     updateCurrentDate();
     loadMedicines();
@@ -1446,10 +1760,77 @@ document.addEventListener('DOMContentLoaded', function() {
     if (resetBtn) {
         resetBtn.addEventListener('click', resetAppearanceSettings);
     }
-    
-    // Conectar botão de salvar prontuário
+    if (clearFormBtn) {
+        clearFormBtn.addEventListener('click', limparFormularioProntuario);
+    }
+
     if (saveProntuarioBtn) {
         saveProntuarioBtn.addEventListener('click', salvarProntuario);
+    }
+
+    // Configurações: Modal de edição de perfil
+    const editProfileBtn = document.getElementById('openProfileModalBtn');
+    const profileModal = document.getElementById('profileModal');
+    const profileModalFields = {
+        name: document.getElementById('profile-name'),
+        role: document.getElementById('profile-role'),
+        email: document.getElementById('profile-email'),
+        phone: document.getElementById('profile-phone'),
+        statsPatients: document.getElementById('profile-stats-patients'),
+        statsRecords: document.getElementById('profile-stats-records'),
+        statsActivity: document.getElementById('profile-stats-activity')
+    };
+
+    if (editProfileBtn && profileModal && Object.values(profileModalFields).every(Boolean)) {
+        editProfileBtn.addEventListener('click', () => {
+            const currentProfile = {
+                name: document.querySelector('.profile-info h3')?.textContent.trim(),
+                role: document.querySelector('.profile-info p')?.textContent.trim(),
+                email: profileModalFields.email.value,
+                phone: profileModalFields.phone.value,
+                statsPatients: document.querySelector('.profile-stats .stat-item:nth-child(1) .stat-value')?.textContent.trim(),
+                statsRecords: document.querySelector('.profile-stats .stat-item:nth-child(2) .stat-value')?.textContent.trim(),
+                statsActivity: document.querySelector('.profile-stats .stat-item:nth-child(3) .stat-value')?.textContent.trim()
+            };
+
+            profileModalFields.name.value = currentProfile.name || '';
+            profileModalFields.role.value = currentProfile.role || '';
+            profileModalFields.email.value = currentProfile.email || '';
+            profileModalFields.phone.value = currentProfile.phone || '';
+            profileModalFields.statsPatients.value = currentProfile.statsPatients || '';
+            profileModalFields.statsRecords.value = currentProfile.statsRecords || '';
+            profileModalFields.statsActivity.value = currentProfile.statsActivity || '';
+
+            profileModal.style.display = 'flex';
+        });
+
+        const closeProfileModal = () => {
+            profileModal.style.display = 'none';
+        };
+
+        profileModal.addEventListener('click', (event) => {
+            if (event.target === profileModal || event.target.classList.contains('close-btn')) {
+                closeProfileModal();
+            }
+        });
+
+        const saveProfileBtn = document.getElementById('saveProfileBtn');
+        if (saveProfileBtn) {
+            saveProfileBtn.addEventListener('click', () => {
+                const profileNameEl = document.querySelector('.profile-info h3');
+                const profileRoleEl = document.querySelector('.profile-info p');
+                const statValues = document.querySelectorAll('.profile-stats .stat-item .stat-value');
+
+                if (profileNameEl) profileNameEl.textContent = profileModalFields.name.value;
+                if (profileRoleEl) profileRoleEl.textContent = profileModalFields.role.value;
+                if (statValues[0]) statValues[0].textContent = profileModalFields.statsPatients.value || '0';
+                if (statValues[1]) statValues[1].textContent = profileModalFields.statsRecords.value || '0';
+                if (statValues[2]) statValues[2].textContent = profileModalFields.statsActivity.value || '0%';
+
+                showToast('Perfil atualizado com sucesso!', 'success');
+                closeProfileModal();
+            });
+        }
     }
     
     // Conectar botão de imprimir prontuário atual
