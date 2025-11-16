@@ -1,5 +1,5 @@
 // Dados dos medicamentos para uso no backend
-module.exports = {
+const medicamentos = {
     analgesicos: [
         { nome: "Paracetamol IV", uso: "Dor leve a moderada, febre", quantidade: 150, status: "in-stock" },
         { nome: "Dipirona IV", uso: "Dor e febre", quantidade: 200, status: "in-stock" },
@@ -40,3 +40,4 @@ module.exports = {
         { nome: "Ácido tranexâmico IV", uso: "Hemorragias graves", quantidade: 45, status: "low-stock" }
     ]
 };
+export default medicamentos;

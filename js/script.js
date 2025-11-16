@@ -1,88 +1,118 @@
-// Dados dos medicamentos
-const medicamentos = {
-    "analgesicos": [
-        { nome: "Paracetamol IV", uso: "Dor leve a moderada, febre", quantidade: 150, status: "in-stock" },
-        { nome: "Dipirona IV", uso: "Dor e febre", quantidade: 200, status: "in-stock" },
-        { nome: "Morfina IV", uso: "Dor intensa", quantidade: 80, status: "in-stock" },
-        { nome: "Fentanil IV", uso: "Dor intensa, analgesia em UTI", quantidade: 45, status: "low-stock" },
-        { nome: "Tramadol IV", uso: "Dor moderada a intensa", quantidade: 120, status: "in-stock" },
-        { nome: "Midazolam IV", uso: "Sedação, crises convulsivas", quantidade: 60, status: "low-stock" },
-        { nome: "Propofol IV", uso: "Sedação profunda em UTI ou anestesia", quantidade: 30, status: "low-stock" }
-    ],
-    "antibioticos": [
-        { nome: "Ceftriaxona IV", uso: "Infecções bacterianas graves", quantidade: 100, status: "in-stock" },
-        { nome: "Cefepime IV", uso: "Infecções hospitalares, Pseudomonas", quantidade: 75, status: "in-stock" },
-        { nome: "Meropenem IV", uso: "Infecções graves resistentes", quantidade: 40, status: "low-stock" },
-        { nome: "Vancomicina IV", uso: "Infecções por MRSA", quantidade: 50, status: "low-stock" },
-        { nome: "Piperacilina-tazobactam IV", uso: "Infecções graves, abrange gram-positivos e negativos", quantidade: 65, status: "in-stock" },
-        { nome: "Amicacina IV", uso: "Infecções por gram-negativos resistentes", quantidade: 35, status: "low-stock" },
-        { nome: "Metronidazol IV", uso: "Infecções anaeróbicas, intra-abdominais", quantidade: 90, status: "in-stock" }
-    ],
-    "cardiovasculares": [
-        { nome: "Adrenalina (epinefrina) IV", uso: "Parada cardíaca, anafilaxia", quantidade: 25, status: "low-stock" },
-        { nome: "Noradrenalina IV", uso: "Choque séptico", quantidade: 30, status: "low-stock" },
-        { nome: "Dopamina IV", uso: "Suporte circulatório em choque", quantidade: 40, status: "low-stock" },
-        { nome: "Dobutamina IV", uso: "Insuficiência cardíaca, choque cardiogênico", quantidade: 35, status: "low-stock" },
-        { nome: "Atropina IV", uso: "Bradicardia grave", quantidade: 50, status: "in-stock" },
-        { nome: "Lidocaína IV", uso: "Arritmias ventriculares", quantidade: 20, status: "low-stock" },
-        { nome: "Amiodarona IV", uso: "Arritmias graves, fibrilação ventricular", quantidade: 15, status: "out-of-stock" }
-    ],
-    "solucoes": [
-        { nome: "Soro fisiológico 0,9%", uso: "Reposição de líquidos, hidratação", quantidade: 500, status: "in-stock" },
-        { nome: "Ringer lactato", uso: "Reposição de líquidos e eletrólitos", quantidade: 300, status: "in-stock" },
-        { nome: "Cloreto de potássio IV", uso: "Hipocalemia, reposição eletrolítica", quantidade: 80, status: "in-stock" },
-        { nome: "Bicarbonato de sódio IV", uso: "Acidose metabólica grave", quantidade: 60, status: "in-stock" },
-        { nome: "Cloreto de cálcio IV", uso: "Hipocalcemia, paralisia por hipercalemia", quantidade: 40, status: "low-stock" },
-        { nome: "Sulfato de magnésio IV", uso: "Pré-eclâmpsia, arritmias, broncoespasmo grave", quantidade: 35, status: "low-stock" }
-    ],
-    "anticoagulantes": [
-        { nome: "Heparina IV", uso: "Prevenção e tratamento de tromboses", quantidade: 70, status: "in-stock" },
-        { nome: "Ácido tranexâmico IV", uso: "Hemorragias graves", quantidade: 45, status: "low-stock" },
-        { nome: "Clopidogrel IV", uso: "Em algumas situações de UTI ou cardiologia", quantidade: 25, status: "low-stock" }
-    ],
-    "anticonvulsivantes": [
-        { nome: "Fenitoína IV", uso: "Convulsões prolongadas, epilepsia", quantidade: 55, status: "in-stock" },
-        { nome: "Levetiracetam IV", uso: "Convulsões, alternativa moderna", quantidade: 40, status: "low-stock" },
-        { nome: "Valproato de sódio IV", uso: "Crises convulsivas, status epilepticus", quantidade: 30, status: "low-stock" }
-    ],
-    "corticoides": [
-        { nome: "Dexametasona IV", uso: "Alergias graves, choque séptico, inflamação", quantidade: 85, status: "in-stock" },
-        { nome: "Metilprednisolona IV", uso: "Crises agudas, inflamação severa", quantidade: 60, status: "in-stock" },
-        { nome: "Hidrocortisona IV", uso: "Insuficiência adrenal, choque séptico", quantidade: 45, status: "low-stock" }
-    ],
-    "antiemeticos": [
-        { nome: "Ondansetrona IV", uso: "Náuseas e vômitos, quimioterapia", quantidade: 95, status: "in-stock" },
-        { nome: "Metoclopramida IV", uso: "Náuseas e vômitos, gastroparesia", quantidade: 70, status: "in-stock" },
-        { nome: "Dimenidrinato IV", uso: "Náuseas graves", quantidade: 50, status: "in-stock" }
-    ],
-    "outros": [
-        { nome: "Insulina IV", uso: "Controle de hiperglicemia em UTI", quantidade: 110, status: "in-stock" },
-        { nome: "Glucose 10% ou 25% IV", uso: "Hipoglicemia grave, nutrição", quantidade: 200, status: "in-stock" },
-        { nome: "Furosemida IV", uso: "Edema, insuficiência cardíaca, diurético", quantidade: 65, status: "in-stock" },
-        { nome: "Manitol IV", uso: "Edema cerebral, pressão intracraniana", quantidade: 30, status: "low-stock" },
-        { nome: "Naloxona IV", uso: "Reversão de efeito de opioides", quantidade: 25, status: "low-stock" },
-        { nome: "Flumazenil IV", uso: "Reversão de benzodiazepínicos", quantidade: 20, status: "low-stock" }
-    ]
-};
+// Carregar medicamentos da API
+var medicamentos = {};
 
-// Elementos DOM
-const navLinks = document.querySelectorAll('.nav-link');
-const pageContents = document.querySelectorAll('.page-content');
-const pageTitle = document.getElementById('pageTitle');
-const logoutBtn = document.getElementById('logout-btn');
-const logoutModal = document.getElementById('logoutModal');
-const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
-const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
-const closeButtons = document.querySelectorAll('.close-btn');
-const toast = document.getElementById('toast');
-const saveProntuarioBtn = document.getElementById('save-prontuario');
-const clearFormBtn = document.getElementById('clear-form');
-const medicinesContainer = document.getElementById('medicines-container');
-const categoryButtons = document.querySelectorAll('.category-btn');
-const searchInput = document.querySelector('.search-input');
-const quantityModal = document.getElementById('quantityModal');
-const cancelQuantityBtn = document.getElementById('cancelQuantityBtn');
-const saveQuantityBtn = document.getElementById('saveQuantityBtn');
+function fetchMedicamentos(callback) {
+    fetch('/api/medicamentos')
+        .then(function(response) {
+            if (response.ok) {
+                return response.json();
+            } else {
+                console.error('Erro ao buscar medicamentos:', response.statusText);
+                return {};
+            }
+        })
+        .then(function(data) {
+            medicamentos = data;
+            if (typeof callback === 'function') callback();
+        })
+        .catch(function(error) {
+            console.error('Erro de conexão com a API de medicamentos:', error);
+        });
+}
+
+// Função para renderizar os medicamentos na tela
+function renderMedicines(category = 'all', searchTerm = '') {
+    if (!medicinesContainer) return;
+    medicinesContainer.innerHTML = '';
+    let medicinesToShow = [];
+    if (category === 'all') {
+        for (const cat in medicamentos) {
+            medicinesToShow = medicinesToShow.concat(medicamentos[cat]);
+        }
+    } else {
+        medicinesToShow = medicamentos[category] || [];
+    }
+    if (searchTerm) {
+        medicinesToShow = medicinesToShow.filter(function(med) {
+            return med.nome.toLowerCase().includes(searchTerm.toLowerCase());
+        });
+    }
+    medicinesToShow.forEach(function(med) {
+        var medicineCard = document.createElement('div');
+        medicineCard.className = 'medicine-card';
+        medicineCard.innerHTML = `
+            <div class="medicine-header">
+                <h3 class="medicine-name">${med.nome}</h3>
+                <span class="medicine-category">${category === 'all' ? '' : getCategoryName(category)}</span>
+            </div>
+            <div class="medicine-body">
+                <div class="medicine-info">
+                    <div class="info-item">
+                        <span class="info-label">Uso:</span>
+                        <span>${med.uso}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Quantidade:</span>
+                        <span>${med.quantidade} unidades</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status:</span>
+                        <span>${med.status}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        medicinesContainer.appendChild(medicineCard);
+    });
+}
+
+// Inicialização dinâmica ao carregar medicamentos e navegação
+document.addEventListener('DOMContentLoaded', function() {
+    fetchMedicamentos(function() {
+        renderMedicines();
+    });
+
+    // Ativação dos botões de categoria
+    document.querySelectorAll('.category-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.category-btn').forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            var category = btn.getAttribute('data-category');
+            renderMedicines(category);
+        });
+    });
+
+    // Ativação do filtro de busca
+    var searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            var activeCategory = document.querySelector('.category-btn.active').getAttribute('data-category');
+            renderMedicines(activeCategory, searchInput.value);
+        });
+    }
+
+    // Navegação entre páginas
+    document.querySelectorAll('.nav-link').forEach(function(link) {
+        link.addEventListener('click', function() {
+            if (link.id === 'logout-btn') {
+                document.getElementById('logoutModal').style.display = 'flex';
+                return;
+            }
+            var page = link.getAttribute('data-page');
+            document.querySelectorAll('.nav-link').forEach(function(l) { l.classList.remove('active'); });
+            link.classList.add('active');
+            document.querySelectorAll('.page-content').forEach(function(content) { content.classList.remove('active'); });
+            var pageDiv = document.getElementById(page + '-page');
+            if (pageDiv) {
+                pageDiv.classList.add('active');
+                var pageTitle = document.getElementById('pageTitle');
+                if (pageTitle && window.pageTitles && window.pageTitles[page]) {
+                    pageTitle.textContent = window.pageTitles[page];
+                }
+            }
+        });
+    });
+});
 const decreaseBtn = document.getElementById('decrease-btn');
 const increaseBtn = document.getElementById('increase-btn');
 const newQuantityInput = document.getElementById('new-quantity');
