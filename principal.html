@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- Sidebar -->
+        <!-- menu lateral -->
         <aside class="sidebar">
             <div class="logo">
                 <h1>Med<span>Control</span></h1>
@@ -48,7 +48,7 @@
             </ul>
         </aside>
 
-        <!-- Main Content -->
+        <!-- conteudo principal -->
         <main class="main-content">
             <div class="header">
                 <h1 class="page-title" id="pageTitle">Controle de Estoque</h1>
@@ -190,7 +190,7 @@
                                 <i class="fas fa-save"></i>
                                 Salvar Prontuário
                             </button>
-                            <button class="btn btn-outline" id="print-prontuario">
+                            <button class="btn btn-outline">
                                 <i class="fas fa-print"></i>
                                 Imprimir
                             </button>
@@ -689,6 +689,38 @@
                                         </button>
                                     </div>
                                 </div>
+                                
+                                <div class="setting-card">
+                                    <div class="setting-card-header">
+                                        <div class="setting-card-icon">
+                                            <i class="fas fa-history"></i>
+                                        </div>
+                                        <h4 class="setting-card-title">Sessões Ativas</h4>
+                                    </div>
+                                    <div class="setting-card-description">
+                                        Gerencie dispositivos conectados à sua conta.
+                                    </div>
+                                    
+                                    <div class="setting-option">
+                                        <div>
+                                            <div class="option-label">Este dispositivo</div>
+                                            <div class="option-description">Chrome • Windows • Ativo agora</div>
+                                        </div>
+                                        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem;">
+                                            Sair
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="setting-option">
+                                        <div>
+                                            <div class="option-label">Smartphone Android</div>
+                                            <div class="option-description">Samsung • Último acesso: 2 dias atrás</div>
+                                        </div>
+                                        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.8rem;">
+                                            Sair
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -753,7 +785,7 @@
                 <button class="close-btn">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Tem certeza que deseja sair do sistema?</p>
+                <p>Tem certeza que deseja saída do sistema?</p>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" id="cancelLogoutBtn">Cancelar</button>
