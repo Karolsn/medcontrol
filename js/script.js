@@ -1,39 +1,66 @@
 // Carregar medicamentos da API
+// Se quiser apontar para um backend específico, defina window.API_BASE_URL no HTML
+// Ex: <script>window.API_BASE_URL = 'https://seu-dominio.com';</script>
+var API_BASE_URL = (typeof window !== 'undefined' && window.API_BASE_URL) ? window.API_BASE_URL : '';
+
+function buildApiUrl(path) {
+	// Se API_BASE_URL estiver definido, usa absoluto; senão usa caminho relativo
+	return API_BASE_URL ? API_BASE_URL + path : path;
+}
+
 var medicamentos = {};
 
 function fetchMedicamentos(callback) {
-    fetch('/api/medicamentos')
-        .then(function(response) {
-            if (response.ok) {
-                return response.json();
-            } else {
-                console.error('Erro ao buscar medicamentos:', response.statusText);
-                return {};
-            }
-        })
-        .then(function(data) {
-            // Corrigir caso venha com .default
-            if (data && data.default) {
-                medicamentos = data.default;
-            } else {
-                medicamentos = data;
-            }
-            
-            // Normalizar status dos medicamentos do banco de dados
-            for (const categoria in medicamentos) {
-                if (Array.isArray(medicamentos[categoria])) {
-                    medicamentos[categoria] = medicamentos[categoria].map(med => ({
-                        ...med,
-                        status: normalizeStatus(med.status)
-                    }));
-                }
-            }
-            
-            if (typeof callback === 'function') callback();
-        })
-        .catch(function(error) {
-            console.error('Erro de conexão com a API de medicamentos:', error);
-        });
+	const primaryUrl = buildApiUrl('/api/medicamentos');
+	const fallbackUrl = 'http://localhost:3000/api/medicamentos';
+
+	function processData(data) {
+		// Corrigir caso venha com .default
+		if (data && data.default) {
+			medicamentos = data.default;
+		} else {
+			medicamentos = data || {};
+		}
+		
+		// Normalizar status dos medicamentos do banco de dados
+		for (const categoria in medicamentos) {
+			if (Array.isArray(medicamentos[categoria])) {
+				medicamentos[categoria] = medicamentos[categoria].map(med => ({
+					...med,
+					status: normalizeStatus(med.status)
+				}));
+			}
+		}
+		
+		if (typeof callback === 'function') callback();
+	}
+
+	function fetchFrom(url, isFallback) {
+		return fetch(url)
+			.then(function(response) {
+				if (response.ok) {
+					return response.json();
+				} else {
+					console.error('Erro ao buscar medicamentos:', response.status, response.statusText, 'URL:', url);
+					// Se não for fallback e existir URL de fallback diferente, tentar
+					if (!isFallback && url !== fallbackUrl) {
+						console.log('Tentando API de fallback em localhost...');
+						return fetchFrom(fallbackUrl, true);
+					}
+					return {};
+				}
+			})
+			.catch(function(error) {
+				console.error('Erro de conexão com a API de medicamentos:', error, 'URL:', url);
+				if (!isFallback && url !== fallbackUrl) {
+					console.log('Tentando API de fallback em localhost após erro de conexão...');
+					return fetchFrom(fallbackUrl, true);
+				}
+				return {};
+			});
+	}
+
+	fetchFrom(primaryUrl, false).then(processData);
 }
 
 // Funções auxiliares
@@ -1188,7 +1215,7 @@ function saveQuantity() {
     // Atualizar no backend
     console.log('Enviando atualização:', { nome: currentMedicine.nome, quantidade: newQuantity });
     
-    fetch('/api/medicamentos/quantidade', {
+    fetch(buildApiUrl('/api/medicamentos/quantidade'), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

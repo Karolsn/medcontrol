@@ -92,7 +92,52 @@
                 <!-- Medicines Grid -->
                 <section class="medicines-grid" id="medicines-container">
                     <!-- Os medicamentos serão carregados aqui via JavaScript -->
+                    <!-- Exemplo de card de medicamento (será gerado dinamicamente):
+                    <div class="medicine-card">
+                        <div class="medicine-info">
+                            <div class="medicine-name">Paracetamol IV</div>
+                            <div class="medicine-quantity">150 unidades</div>
+                            <div class="medicine-status in-stock">EM ESTOQUE</div>
+                        </div>
+                        <button class="btn btn-outline edit-quantity-btn" data-medicine-id="1">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                    </div>
+                    -->
                 </section>
+
+                <!-- MOVIDO: Modal de Alterar Quantidade agora fica dentro de estoque-page -->
+                <div class="modal" id="quantityModal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="quantityModalTitle">Alterar Quantidade</h3>
+                            <button class="close-btn" id="closeQuantityModalBtn">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="form-label">Quantidade Atual</label>
+                                <div id="current-quantity" style="font-size: 1.2rem; font-weight: bold; text-align: center; padding: 10px; background: #f8f9fa; border-radius: var(--border-radius);">0</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nova Quantidade</label>
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn" id="decrease-btn">-</button>
+                                    <input type="number" class="quantity-input" id="new-quantity" value="0" min="0">
+                                    <button class="quantity-btn" id="increase-btn">+</button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Status do Estoque</label>
+                                <div id="stock-status-preview" class="stock-status in-stock">EM ESTOQUE</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-outline" id="cancelQuantityBtn">Cancelar</button>
+                            <button class="btn btn-primary" id="saveQuantityBtn">Salvar</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Página: Prontuário Eletrônico -->
@@ -212,6 +257,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- Página: Prontuários Salvos -->
 <div class="page-content" id="prontuarios-salvos-page">
     <div class="prontuarios-salvos-container">
@@ -583,30 +629,7 @@
                             </div>
                         </div>
                     </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Quantidade Atual</label>
-                    <div id="current-quantity" style="font-size: 1.2rem; font-weight: bold; text-align: center; padding: 10px; background: #f8f9fa; border-radius: var(--border-radius);">0</div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Nova Quantidade</label>
-                    <div class="quantity-controls">
-                        <button class="quantity-btn" id="decrease-btn">-</button>
-                        <input type="number" class="quantity-input" id="new-quantity" value="0" min="0">
-                        <button class="quantity-btn" id="increase-btn">+</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Status do Estoque</label>
-                    <div id="stock-status-preview" class="stock-status in-stock">EM ESTOQUE</div>
-                </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" id="cancelQuantityBtn">Cancelar</button>
-                <button class="btn btn-primary" id="saveQuantityBtn">Salvar</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal de Logout -->
     <div class="modal" id="logoutModal">
@@ -628,6 +651,24 @@
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
+    <script>
+        // URL base da API. Em desenvolvimento, usar o backend Node em localhost.
+        // Em produção (Vercel, etc.), você pode remover isso ou apontar para o domínio da API.
+        window.API_BASE_URL = 'http://localhost:3000';
+    </script>
+    <script>
+        // Defina suas credenciais do Supabase aqui (coloque as reais em ambiente seguro)
+        // Exemplo:
+        // window.SUPABASE_URL = 'https://xxxxx.supabase.co';
+        // window.SUPABASE_ANON_KEY = 'eyJhbGciOi...';
+        window.SUPABASE_URL = window.SUPABASE_URL || '';
+        window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+    </script>
+
+    <!-- Supabase client (UMD) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script src="js/supabaseClient.js"></script>
     <script src="js/script.js"></script>
+
 </body>
 </html>
