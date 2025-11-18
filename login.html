@@ -292,7 +292,7 @@
 </head>
 <body>
     <div class="login-container">
-        <!-- Left Panel -->
+        <!-- painel lateral -->
         <div class="login-left">
             <div class="logo">
                 <h1>Med<span>Control</span></h1>
@@ -332,7 +332,7 @@
             </div>
         </div>
         
-        <!-- Right Panel -->
+        <!-- painel de cima -->
         <div class="login-right">
             <div class="login-header">
                 <h2>Faça login em sua conta</h2>
@@ -379,7 +379,7 @@
         </div>
     </div>
     
-    <!-- Toast Notification -->
+    <!-- notificacao  -->
     <div class="toast" id="toast"></div>
 
     <script>
@@ -389,7 +389,7 @@
         const passwordInput = document.getElementById('password');
         const toast = document.getElementById('toast');
         
-        // Credenciais válidas para demonstração
+        // Credenciais válidas
         const validCredentials = {
             'karol': 'karol',
             'admin': 'admin123',
@@ -421,71 +421,49 @@
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
-        }// Processar login
-loginForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    
-    // Validação simples
-    if (!username || !password) {
-        showToast('Por favor, preencha todos os campos!', 'error');
-        return;
-    }
-    
-    try {
-        const response = await fetch('http://localhost:3000/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password })
+        }
+
+        // Processar login - VERSÃO SIMPLIFICADA E FUNCIONAL
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Validação simples
+            if (!username || !password) {
+                showToast('Por favor, preencha todos os campos!', 'error');
+                return;
+            }
+            
+            console.log('Tentando login com:', username, password);
+            
+            // Verificar credenciais LOCALMENTE (sem API)
+            if (validCredentials[username] && validCredentials[username] === password) {
+                showToast('Login realizado com sucesso!', 'success');
+                
+                // Salvar info do usuário no localStorage
+                const userInfo = {
+                    username: username,
+                    name: username === 'karol' ? 'Karol Silva' : 
+                          username === 'admin' ? 'Administrador' : 'Usuário Teste',
+                    role: 'admin'
+                };
+                localStorage.setItem('user', JSON.stringify(userInfo));
+                
+                // Redirecionar após 1 segundo
+                setTimeout(() => {
+                    window.location.href = 'principal.html';
+                }, 1000);
+            } else {
+                showToast('Usuário ou senha incorretos!', 'error');
+                document.getElementById('password').value = '';
+                loginForm.classList.add('shake');
+                setTimeout(() => loginForm.classList.remove('shake'), 500);
+            }
         });
-
-        const data = await response.json();
-
-        if (data.success) {
-            showToast('Login realizado com sucesso!', 'success');
-            
-            // Salvar info do usuário
-            localStorage.setItem('user', JSON.stringify(data.user));
-            
-            setTimeout(() => {
-                window.location.href = 'principal.html';
-            }, 1500);
-        } else {
-            showToast('Usuário ou senha incorretos!', 'error');
-            document.getElementById('password').value = '';
-            loginForm.classList.add('shake');
-            setTimeout(() => loginForm.classList.remove('shake'), 500);
-        }
-    } catch (error) {
-        console.error('Erro no login:', error);
-        showToast('Erro de conexão com o servidor', 'error');
         
-        // Fallback para credenciais locais se o servidor estiver offline
-        const validCredentials = {
-            'karol': 'karol',
-            'admin': 'admin123',
-            'usuario': 'senha123'
-        };
-        
-        if (validCredentials[username] && validCredentials[username] === password) {
-            showToast('Login realizado com sucesso! (Modo Offline)', 'success');
-            setTimeout(() => {
-                window.location.href = 'principal.html';
-            }, 1500);
-        } else {
-            showToast('Usuário ou senha incorretos!', 'error');
-            document.getElementById('password').value = '';
-            loginForm.classList.add('shake');
-            setTimeout(() => loginForm.classList.remove('shake'), 500);
-        }
-    }
-});
-        
-        // Adicionar estilo para animação de shake
+        // Adicionar estilo para animação 
         const style = document.createElement('style');
         style.textContent = `
             .shake {
@@ -499,8 +477,12 @@ loginForm.addEventListener('submit', async function(e) {
             }
         `;
         document.head.appendChild(style);
+
+        // Debug: mostrar credenciais no console
+        console.log('Credenciais disponíveis:');
+        console.log('karol / karol');
+        console.log('admin / admin123');
+        console.log('usuario / senha123');
     </script>
 </body>
 </html>
-
-

@@ -24,7 +24,7 @@ function fetchMedicamentos(callback) {
         });
 }
 
-// Dados locais dos medicamentos como fallback
+// dados locais dos medicamentos como fallback
 function getLocalMedicamentos() {
     return {
         "analgesicos": [
@@ -93,7 +93,7 @@ function getLocalMedicamentos() {
     };
 }
 
-// Função para renderizar os medicamentos na tela
+// função para renderizar os medicamentos na tela
 function renderMedicines(category = 'all', searchTerm = '') {
     const medicinesContainer = document.getElementById('medicines-container');
     if (!medicinesContainer) {
@@ -217,12 +217,12 @@ function getStatusText(status) {
     return statusTexts[status] || 'DESCONHECIDO';
 }
 
-// Variáveis globais
+// variáveis globais
 let currentCategory = 'all';
 let currentMedicine = null;
 let currentMedicineElement = null;
 
-// Títulos das páginas
+// títulos das páginas
 const pageTitles = {
     'estoque': 'Controle de Estoque - Medicamentos',
     'prontuario': 'Prontuário Eletrônico',
@@ -231,7 +231,7 @@ const pageTitles = {
     'configuracoes': 'Configurações do Sistema'
 };
 
-// DADOS INICIAIS PARA DEMONSTRAÇÃO
+// dados de demonstraca
 let teamMembers = [
     { id: 1, name: "Dra. Ana Silva", role: "Médica Plantonista", status: "present" },
     { id: 2, name: "Enf. Carlos Santos", role: "Enfermeiro Chefe", status: "present" },
@@ -270,11 +270,11 @@ let patients = [
     }
 ];
 
-// ========== SISTEMA DE PRONTUÁRIOS SALVOS ==========
+// ========== prontuarios salvos ==========
 
 let prontuariosSalvos = JSON.parse(localStorage.getItem('prontuariosSalvos')) || [];
 
-// Salvar prontuário
+// salvar prontuário
 function salvarProntuario() {
     const patientNameInput = document.getElementById('patient-name');
     if (!patientNameInput) {
@@ -312,7 +312,7 @@ function salvarProntuario() {
     showToast('Prontuário salvo com sucesso!', 'success');
 }
 
-// Coletar sinais vitais
+// coletar sinais vitais
 function coletarSinaisVitais() {
     const vitalInputs = document.querySelectorAll('.vital-input');
     const vitalLabels = document.querySelectorAll('.vital-label');
@@ -326,7 +326,7 @@ function coletarSinaisVitais() {
     return vitais;
 }
 
-// Limpar formulário do prontuário
+// limpar formulário do prontuário
 function limparFormularioProntuario() {
     const formInputs = document.querySelectorAll('#prontuario-page input, #prontuario-page textarea');
     formInputs.forEach(input => {
@@ -334,7 +334,7 @@ function limparFormularioProntuario() {
     });
 }
 
-// Renderizar prontuários salvos
+// renderizar prontuários salvos
 function renderProntuariosSalvos() {
     const prontuariosGrid = document.getElementById('prontuarios-grid');
     const emptyState = document.getElementById('empty-prontuarios');
@@ -389,7 +389,7 @@ function renderProntuariosSalvos() {
     });
 }
 
-// Visualizar prontuário
+// visualizar prontuário
 function visualizarProntuario(id) {
     const prontuario = prontuariosSalvos.find(p => p.id === id);
     if (!prontuario) return;
@@ -464,7 +464,7 @@ function visualizarProntuario(id) {
     document.body.appendChild(modal);
 }
 
-// Deletar prontuário
+// deletar prontuário
 function deletarProntuario(id) {
     if (confirm('Tem certeza que deseja excluir este prontuário?')) {
         prontuariosSalvos = prontuariosSalvos.filter(p => p.id !== id);
@@ -474,7 +474,8 @@ function deletarProntuario(id) {
     }
 }
 
-// Imprimir prontuário salvo
+// I
+// imprimir prontuário salvo
 function imprimirProntuarioSalvo(id) {
     const prontuario = prontuariosSalvos.find(p => p.id === id);
     if (!prontuario) {
@@ -592,7 +593,7 @@ function imprimirProntuarioSalvo(id) {
     showToast('Abrindo impressão...', 'success');
 }
 
-// Função para imprimir prontuário atual
+// função para imprimir prontuário atual
 function printProntuario() {
     const patientNameInput = document.getElementById('patient-name');
     if (!patientNameInput) {
@@ -710,10 +711,10 @@ function printProntuario() {
             ${printContent}
             <div class="no-print" style="text-align: center; margin-top: 30px;">
                 <button onclick="window.print()" style="padding: 10px 20px; background: #2c7fb8; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">
-                    🖨️ Imprimir
+                    Imprimir
                 </button>
                 <button onclick="window.close()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">
-                    ❌ Fechar
+                    Fechar
                 </button>
             </div>
             <script>
@@ -731,7 +732,7 @@ function printProntuario() {
     showToast('Abrindo impressão...', 'success');
 }
 
-// Funções auxiliares
+// funções auxiliares
 function formatarData(dataISO) {
     return new Date(dataISO).toLocaleDateString('pt-BR');
 }
@@ -759,7 +760,7 @@ function formatarLabelVital(key) {
     return labels[key] || key;
 }
 
-// ========== FUNÇÕES PARA CONTROLE DE TAMANHO DA FONTE ==========
+// ========== tamanho da fonte ==========
 
 function applyFontSize(size) {
     document.documentElement.style.setProperty('--base-font-size', size + 'px');
@@ -808,7 +809,7 @@ function initializeFontSizeControls() {
     loadSavedFontSize();
 }
 
-// ========== FUNÇÕES PARA CONTROLE DE TEMA ==========
+// ========== tema ==========
 
 function applyTheme(theme) {
     if (theme === 'dark') {
@@ -852,7 +853,7 @@ function initializeThemeControls() {
     loadSavedTheme();
 }
 
-// ========== FUNÇÃO PARA REDEFINIR CONFIGURAÇÕES ==========
+// ========== redefinir configuracoes ==========
 
 function resetAppearanceSettings() {
     if (confirm('Tem certeza que deseja redefinir todas as configurações de aparência para os padrões?')) {
@@ -864,7 +865,7 @@ function resetAppearanceSettings() {
     }
 }
 
-// ========== FUNÇÕES EXISTENTES DO SISTEMA ==========
+// ========== funcoes ja existentes ==========
 
 function updateCurrentDate() {
     const now = new Date();
@@ -955,7 +956,7 @@ function saveQuantity() {
     if (quantityModal) quantityModal.style.display = 'none';
 }
 
-// Navegação entre páginas
+// navegação entre páginas
 function navegarParaPagina(pagina) {
     const navLinks = document.querySelectorAll('.nav-link');
     const pageContents = document.querySelectorAll('.page-content');
@@ -987,7 +988,7 @@ function navegarParaPagina(pagina) {
     showToast(`Acessando ${pageTitles[pagina] || pagina}`, 'success');
 }
 
-// Adiciona item de menu para Prontuários Salvos
+// adiciona item de menu para prontuários salvos
 function adicionarMenuItemProntuariosSalvos() {
     const navMenu = document.querySelector('.nav-menu');
     const itemChecklist = document.querySelector('.nav-item [data-page="checklist"]')?.closest('.nav-item');
@@ -1013,7 +1014,7 @@ function adicionarMenuItemProntuariosSalvos() {
     });
 }
 
-// Função para mostrar notificações toast
+// função para mostrar notificações toast
 function showToast(message, type = 'success') {
     let toast = document.getElementById('toast');
     if (!toast) {
@@ -1042,7 +1043,7 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// FUNCIONALIDADES PARA ADIÇÃO DE PROFISSIONAIS E PACIENTES
+// funcionalidades
 function initializeChecklistFunctionality() {
     const toggleTeamFormBtn = document.getElementById('toggleTeamForm');
     const teamForm = document.getElementById('teamForm');
@@ -1289,7 +1290,7 @@ function initializeChecklistFunctionality() {
     }
 }
 
-// ========== INICIALIZAÇÃO GERAL ==========
+// ========== iniciar ==========
 
 function initializeEventListeners() {
     const navLinks = document.querySelectorAll('.nav-link');
@@ -1523,3 +1524,344 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Sistema MedControl inicializado com sucesso!');
 });
+// imprimir
+function imprimirProntuarioAtual() {
+    const patientNameInput = document.getElementById('patient-name');
+    if (!patientNameInput) {
+        showToast('Campo de nome do paciente não encontrado!', 'error');
+        return;
+    }
+    
+    const patientName = patientNameInput.value;
+    if (!patientName) {
+        showToast('Preencha o nome do paciente antes de imprimir!', 'error');
+        return;
+    }
+
+    const patientInfo = (document.getElementById('patient-info')?.value || 'Não informado');
+    const currentIllness = (document.getElementById('current-illness')?.value || 'Não informado');
+    const physicalExam = (document.getElementById('physical-exam')?.value || 'Não informado');
+    const diagnosis = (document.getElementById('diagnosis')?.value || 'Não informado');
+    const treatment = (document.getElementById('treatment')?.value || 'Não informado');
+    const evolution = (document.getElementById('evolution')?.value || 'Não informado');
+    
+    const vitalInputs = document.querySelectorAll('.vital-input');
+    const vitalLabels = document.querySelectorAll('.vital-label');
+    let vitaisHTML = '';
+    
+    vitalInputs.forEach((input, index) => {
+        const valor = input.value || '--';
+        const label = vitalLabels[index]?.textContent || `Vital ${index + 1}`;
+        vitaisHTML += `
+            <div style="flex: 1; text-align: center; padding: 10px; border: 1px solid #ddd; margin: 5px; border-radius: 5px;">
+                <div style="font-weight: bold; color: #2c7fb8;">${label}</div>
+                <div style="font-size: 1.2em; margin-top: 5px;">${valor}</div>
+            </div>
+        `;
+    });
+
+    const printContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+            <div style="text-align: center; border-bottom: 3px solid #2c7fb8; padding-bottom: 20px; margin-bottom: 30px;">
+                <h1 style="color: #2c7fb8; margin-bottom: 10px;">PRONTUÁRIO MÉDICO</h1>
+                <p><strong>Hospital MedControl</strong></p>
+                <p>${new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <h2 style="color: #2c7fb8; border-bottom: 2px solid #2c7fb8; padding-bottom: 8px; margin-bottom: 15px;">DADOS DO PACIENTE</h2>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2c7fb8;">
+                    <p><strong>Nome:</strong> ${patientName}</p>
+                    <p><strong>Informações:</strong> ${patientInfo}</p>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <h2 style="color: #2c7fb8; border-bottom: 2px solid #2c7fb8; padding-bottom: 8px; margin-bottom: 15px;">SINAIS VITAIS</h2>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0; justify-content: space-between;">${vitaisHTML}</div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <h2 style="color: #2c7fb8; border-bottom: 2px solid #2c7fb8; padding-bottom: 8px; margin-bottom: 15px;">HISTÓRIA DA DOENÇA ATUAL</h2>
+                <div style="background: #fafafa; border: 1px solid #e0e0e0; padding: 15px; border-radius: 5px; min-height: 80px; white-space: pre-wrap;">${currentIllness}</div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <h2 style="color: #2c7fb8; border-bottom: 2px solid #2c7fb8; padding-bottom: 8px; margin-bottom: 15px;">EXAME FÍSICO</h2>
+                <div style="background: #fafafa; border: 1px solid #e0e0e0; padding: 15px; border-radius: 5px; min-height: 80px; white-space: pre-wrap;">${physicalExam}</div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <h2 style="color: #2c7fb8; border-bottom: 2px solid #2c7fb8; padding-bottom: 8px; margin-bottom: 15px;">DIAGNÓSTICO</h2>
+                <div style="background: #fafafa; border: 1px solid #e0e0e0; padding: 15px; border-radius: 5px; min-height: 80px; white-space: pre-wrap;">${diagnosis}</div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <h2 style="color: #2c7fb8; border-bottom: 2px solid #2c7fb8; padding-bottom: 8px; margin-bottom: 15px;">CONDUTA E PRESCRIÇÕES</h2>
+                <div style="background: #fafafa; border: 1px solid #e0e0e0; padding: 15px; border-radius: 5px; min-height: 80px; white-space: pre-wrap;">${treatment}</div>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <h2 style="color: #2c7fb8; border-bottom: 2px solid #2c7fb8; padding-bottom: 8px; margin-bottom: 15px;">EVOLUÇÃO</h2>
+                <div style="background: #fafafa; border: 1px solid #e0e0e0; padding: 15px; border-radius: 5px; min-height: 80px; white-space: pre-wrap;">${evolution}</div>
+            </div>
+            
+            <div style="margin-top: 60px; text-align: center;">
+                <div style="border-top: 1px solid #000; width: 300px; margin: 40px auto 10px auto; padding-top: 10px;"></div>
+                <p><strong>Dr(a). karol</strong></p>
+                <p>Médica Plantonista | CRM: XX/XXXXX</p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #666;">
+                <p>Documento gerado automaticamente pelo Sistema MedControl</p>
+                <p>Data de emissão: ${new Date().toLocaleString('pt-BR')}</p>
+            </div>
+        </div>
+    `;
+
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    if (!printWindow) {
+        showToast('Permita popups para imprimir!', 'error');
+        return;
+    }
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Prontuário - ${patientName}</title>
+            <style>
+                body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+                @media print {
+                    body { margin: 0; padding: 15px; }
+                    .no-print { display: none; }
+                }
+            </style>
+        </head>
+        <body>
+            ${printContent}
+            <div class="no-print" style="text-align: center; margin-top: 30px;">
+                <button onclick="window.print()" style="padding: 10px 20px; background: #2c7fb8; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">
+                    🖨️ Imprimir
+                </button>
+                <button onclick="window.close()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">
+                    ❌ Fechar
+                </button>
+            </div>
+            <script>
+                window.onload = function() {
+                    setTimeout(() => {
+                        window.print();
+                    }, 500);
+                };
+            </script>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+    showToast('Abrindo impressão...', 'success');
+}
+
+// botao imprimir com funcionalidade
+function initializeEventListeners() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    if (navLinks) {
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (this.id === 'logout-btn') {
+                    const logoutModal = document.getElementById('logoutModal');
+                    if (logoutModal) logoutModal.style.display = 'flex';
+                    return;
+                }
+                
+                const pageId = this.getAttribute('data-page');
+                if (pageId) {
+                    navegarParaPagina(pageId);
+                }
+            });
+        });
+    }
+
+    // para ajeitar a impressao porque estava dando erro
+    const printButtons = document.querySelectorAll('.btn-outline');
+    printButtons.forEach(button => {
+        if (button.innerHTML.includes('fas fa-print') && !button.id) {
+            button.addEventListener('click', function() {
+                imprimirProntuarioAtual();
+            });
+        }
+    });
+
+    // Restante do código existente...
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    if (categoryButtons) {
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                categoryButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                currentCategory = this.getAttribute('data-category') || 'all';
+                const searchInput = document.querySelector('.search-input');
+                renderMedicines(currentCategory, searchInput?.value || '');
+            });
+        });
+    }
+
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            renderMedicines(currentCategory, this.value);
+        });
+    }
+
+    const decreaseBtn = document.getElementById('decrease-btn');
+    const increaseBtn = document.getElementById('increase-btn');
+    const newQuantityInput = document.getElementById('new-quantity');
+
+    if (decreaseBtn && newQuantityInput) {
+        decreaseBtn.addEventListener('click', function() {
+            const currentValue = parseInt(newQuantityInput.value) || 0;
+            if (currentValue > 0) {
+                newQuantityInput.value = currentValue - 1;
+                updateStockStatusPreview(newQuantityInput.value);
+            }
+        });
+    }
+
+    if (increaseBtn && newQuantityInput) {
+        increaseBtn.addEventListener('click', function() {
+            const currentValue = parseInt(newQuantityInput.value) || 0;
+            newQuantityInput.value = currentValue + 1;
+            updateStockStatusPreview(newQuantityInput.value);
+        });
+    }
+
+    if (newQuantityInput) {
+        newQuantityInput.addEventListener('input', function() {
+            updateStockStatusPreview(this.value);
+        });
+    }
+
+    const saveQuantityBtn = document.getElementById('saveQuantityBtn');
+    if (saveQuantityBtn) {
+        saveQuantityBtn.addEventListener('click', saveQuantity);
+    }
+
+    const cancelQuantityBtn = document.getElementById('cancelQuantityBtn');
+    if (cancelQuantityBtn) {
+        cancelQuantityBtn.addEventListener('click', function() {
+            const quantityModal = document.getElementById('quantityModal');
+            if (quantityModal) quantityModal.style.display = 'none';
+        });
+    }
+
+    const logoutBtn = document.getElementById('logout-btn');
+    const logoutModal = document.getElementById('logoutModal');
+    const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+    const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+    if (logoutBtn && logoutModal) {
+        logoutBtn.addEventListener('click', function() {
+            logoutModal.style.display = 'flex';
+        });
+    }
+
+    if (cancelLogoutBtn && logoutModal) {
+        cancelLogoutBtn.addEventListener('click', function() {
+            logoutModal.style.display = 'none';
+        });
+    }
+
+    if (confirmLogoutBtn && logoutModal) {
+        confirmLogoutBtn.addEventListener('click', function() {
+            logoutModal.style.display = 'none';
+            showToast('Saindo do sistema...', 'warning');
+            
+            setTimeout(() => {
+                alert('Você foi desconectado do sistema. Redirecionando para a página de login...');
+            }, 2000);
+        });
+    }
+
+    const saveProntuarioBtn = document.getElementById('save-prontuario');
+    if (saveProntuarioBtn) {
+        saveProntuarioBtn.addEventListener('click', salvarProntuario);
+    }
+
+    const clearFormBtn = document.getElementById('clear-form');
+    if (clearFormBtn) {
+        clearFormBtn.addEventListener('click', function() {
+            if (confirm('Tem certeza que deseja limpar todos os campos do prontuário?')) {
+                limparFormularioProntuario();
+                showToast('Formulário limpo!', 'success');
+            }
+        });
+    }
+
+    const closeButtons = document.querySelectorAll('.close-btn');
+    if (closeButtons) {
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const logoutModal = document.getElementById('logoutModal');
+                const quantityModal = document.getElementById('quantityModal');
+                
+                if (logoutModal) logoutModal.style.display = 'none';
+                if (quantityModal) quantityModal.style.display = 'none';
+            });
+        });
+    }
+
+    window.addEventListener('click', function(event) {
+        const logoutModal = document.getElementById('logoutModal');
+        const quantityModal = document.getElementById('quantityModal');
+        
+        if (logoutModal && event.target === logoutModal) {
+            logoutModal.style.display = 'none';
+        }
+        if (quantityModal && event.target === quantityModal) {
+            quantityModal.style.display = 'none';
+        }
+    });
+
+    const startConsultationBtn = document.getElementById('startConsultationBtn');
+    let consultationStarted = false;
+    let consultationTimer;
+    let consultationSeconds = 0;
+
+    if (startConsultationBtn) {
+        startConsultationBtn.addEventListener('click', function() {
+            if (!consultationStarted) {
+                consultationStarted = true;
+                this.innerHTML = '<i class="fas fa-pause"></i> Pausar Atendimento';
+                this.style.background = '#ffc107';
+                this.style.color = '#333';
+                
+                consultationTimer = setInterval(() => {
+                    consultationSeconds++;
+                    const hours = Math.floor(consultationSeconds / 3600);
+                    const minutes = Math.floor((consultationSeconds % 3600) / 60);
+                    const seconds = consultationSeconds % 60;
+                    
+                    const durationElement = document.querySelector('.duration-time');
+                    if (durationElement) {
+                        durationElement.textContent = 
+                            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                }, 1000);
+                
+                showToast('Atendimento iniciado!', 'success');
+            } else {
+                consultationStarted = false;
+                this.innerHTML = '<i class="fas fa-play"></i> Retomar Atendimento';
+                this.style.background = '#6c757d';
+                this.style.color = 'white';
+                
+                clearInterval(consultationTimer);
+                showToast('Atendimento pausado!', 'warning');
+            }
+        });
+    }
+}

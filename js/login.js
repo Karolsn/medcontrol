@@ -1,19 +1,19 @@
-// Elementos DOM
+// elementos DOM
 const loginForm = document.getElementById('loginForm');
 const togglePassword = document.getElementById('togglePassword');
 const passwordInput = document.getElementById('password');
 const toast = document.getElementById('toast');
 
-// Alternar visibilidade da senha
+// alternar visibilidade da senha
 togglePassword.addEventListener('click', function() {
     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
     passwordInput.setAttribute('type', type);
     
-    // Alterar ícone
+    // alterar ícone
     this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
 });
 
-// Função para mostrar notificações toast
+// função para mostrar notificações toast
 function showToast(message, type = 'success') {
     toast.textContent = message;
     toast.className = 'toast';
@@ -31,14 +31,14 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// Processar login
+// processar login
 loginForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     
-    // Validação simples
+    // validação simples
     if (!username || !password) {
         showToast('Por favor, preencha todos os campos!', 'error');
         return;
@@ -58,7 +58,7 @@ loginForm.addEventListener('submit', async function(e) {
         if (data.success) {
             showToast('Login realizado com sucesso!', 'success');
             
-            // Salvar info do usuário
+            // salvar info do usuário
             localStorage.setItem('user', JSON.stringify(data.user));
             
             setTimeout(() => {
@@ -74,7 +74,7 @@ loginForm.addEventListener('submit', async function(e) {
         console.error('Erro no login:', error);
         showToast('Erro de conexão com o servidor', 'error');
         
-        // Fallback para credenciais locais se o servidor estiver offline
+        // credenciais locais
         const validCredentials = {
             'karol': 'karol',
             'admin': 'admin123',
@@ -95,7 +95,7 @@ loginForm.addEventListener('submit', async function(e) {
     }
 });
 
-// Adicionar estilo para animação de shake
+//besteirinha pra enfeitar
 const style = document.createElement('style');
 style.textContent = `
     .shake {

@@ -33,7 +33,7 @@ body {
     min-height: 100vh;
 }
 
-/* ========== TEMA ESCURO ========== */
+/* ========== escuro ========== */
 body.dark-theme {
     background-color: #121212;
     color: #f0f0f0;
@@ -138,7 +138,7 @@ body.dark-theme .backup-option {
     border-color: #444;
 }
 
-/* ========== CONTROLE DE TAMANHO DA FONTE ========== */
+/* ========== fonte ========== */
 .page-title {
     font-size: calc(var(--base-font-size) * 1.5);
 }
@@ -186,7 +186,7 @@ body.dark-theme .backup-option {
     font-size: calc(var(--base-font-size) * 0.9);
 }
 
-/* Presets de tamanho de fonte */
+/* fonte */
 .font-size-presets {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -218,7 +218,7 @@ body.dark-theme .backup-option {
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* Melhorias no slider de range */
+/* melhorias */
 .range-container {
     padding: 20px 0;
 }
@@ -272,7 +272,7 @@ body.dark-theme .backup-option {
     min-width: 80px;
 }
 
-/* Ajustes para tema escuro */
+/* ajustar o ema */
 body.dark-theme .font-size-btn {
     background-color: #2d2d2d;
     color: #f0f0f0;
@@ -347,7 +347,7 @@ body.dark-theme .range-value {
     font-size: 1.2rem;
 }
 
-/* Main Content */
+
 .main-content {
     flex: 1;
     padding: 20px;
@@ -390,7 +390,7 @@ body.dark-theme .range-value {
     display: block;
 }
 
-/* Estoque Styles */
+/* estoque */
 .filters {
     background-color: white;
     border-radius: var(--border-radius);
@@ -559,7 +559,7 @@ body.dark-theme .range-value {
     color: white;
 }
 
-/* PRONTUÁRIO ESTILOS */
+/* prontuario */
 .prontuario-container {
     background: white;
     border-radius: var(--border-radius);
@@ -829,7 +829,7 @@ textarea.form-control {
     background: var(--danger);
 }
 
-/* NOVOS ESTILOS PARA CHECKLIST ATUALIZADO */
+
 .checklist-container {
     background: white;
     border-radius: var(--border-radius);
@@ -1040,7 +1040,7 @@ textarea.form-control {
     line-height: 1.5;
 }
 
-/* NOVOS ESTILOS PARA ADIÇÃO DE ITENS */
+/* novos itens */
 .add-item-form {
     background: #f8f9fa;
     border: 2px dashed #dee2e6;
@@ -1151,7 +1151,7 @@ textarea.form-control {
     opacity: 0.5;
 }
 
-/* NOVOS ESTILOS PARA CONFIGURAÇÕES MELHORADAS */
+/* configuracoes*/
 .settings-container {
     display: flex;
     flex-direction: column;
@@ -1264,7 +1264,7 @@ textarea.form-control {
     margin-top: 3px;
 }
 
-/* Switch Toggle */
+
 .switch {
     position: relative;
     display: inline-block;
@@ -1334,7 +1334,7 @@ input:checked + .slider:before {
     outline: none;
 }
 
-/* Action Buttons */
+/* botoesv*/
 .setting-actions {
     display: flex;
     gap: 10px;
@@ -1396,7 +1396,7 @@ input:checked + .slider:before {
     background: #5a6268;
 }
 
-/* Profile Section */
+
 .profile-header {
     display: flex;
     align-items: center;
@@ -1451,7 +1451,7 @@ input:checked + .slider:before {
     color: var(--gray);
 }
 
-/* Theme Preview */
+
 .theme-previews {
     display: flex;
     gap: 15px;
@@ -1556,7 +1556,7 @@ input:checked + .slider:before {
     color: var(--gray);
 }
 
-/* Security Indicators */
+
 .security-level {
     display: flex;
     align-items: center;
@@ -1668,7 +1668,7 @@ input:checked + .slider:before {
     .font-size-presets {
         grid-template-columns: 1fr;
     }
-/* ========== ESTILOS PARA PRONTUÁRIOS SALVOS ========== */
+/* ========== prontuario ========== */
 .prontuarios-salvos-container {
     background: white;
     border-radius: var(--border-radius);
@@ -1843,7 +1843,7 @@ input:checked + .slider:before {
     color: var(--gray);
 }
 
-/* Tema escuro para prontuários salvos */
+/* tema escuro para prontuários salvos */
 body.dark-theme .prontuarios-salvos-container,
 body.dark-theme .prontuario-card {
     background: #1e1e1e;
@@ -1873,7 +1873,7 @@ body.dark-theme .vital-view-item {
     background: #2d2d2d;
     border-color: #444;
 }
-/* ========== ESTILOS PARA PRONTUÁRIOS SALVOS ========== */
+/* ========== estilo prontuario salvos ========== */
 .prontuarios-salvos-container {
     background: white;
     border-radius: var(--border-radius);
@@ -1981,7 +1981,7 @@ body.dark-theme .vital-view-item {
     color: white;
 }
 
-/* Modal de Visualização de Prontuário */
+/* visualização de Prontuário */
 .prontuario-modal-content {
     max-width: 800px;
     max-height: 90vh;

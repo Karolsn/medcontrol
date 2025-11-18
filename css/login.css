@@ -239,7 +239,7 @@ body {
     font-size: 0.9rem;
 }
 
-/* Toast */
+
 .toast {
     position: fixed;
     bottom: 20px;
@@ -264,7 +264,7 @@ body {
     background: var(--danger);
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
     .login-container {
         flex-direction: column;
